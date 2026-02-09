@@ -9,13 +9,33 @@ Transform messy codebases into production-grade applications using coordinated A
 - **19 Specialized Agents**: From API detectives to performance optimizers
 - **Agent Coordination**: Agents communicate and collaborate to solve complex issues
 - **Safety First**: Git-based rollback, test validation, human approval gates
-- **NPM-Installable**: One command to add to any project
 - **Framework Agnostic**: Works with React, Vue, Node, Python, and more
+- **Cloud-Ready**: Seamlessly integrates with Ollama Cloud models via Claude Code
+
+## Prerequisites
+
+1.  **Ollama** - Install from [https://ollama.com](https://ollama.com)
+    ```bash
+    curl -fsSL https://ollama.com/install.sh | sh
+    ollama serve &  # Ensure the background service is running
+    ```
+
+2.  **Claude Code** - Install from [https://code.claude.com](https://code.claude.com)
+    ```bash
+    npm install -g @anthropic-ai/claude-code
+    ```
+
+3.  **Git** - For safety and version control
 
 ## Installation
 
+### Local Development Setup
+If you are working with the source code directly:
 ```bash
-npm install -g codeswarm
+git clone https://github.com/O96a/codeswarm.git
+cd codeswarm
+npm install
+sudo npm link
 ```
 
 ## Quick Start
@@ -23,7 +43,7 @@ npm install -g codeswarm
 ```bash
 # Initialize in your project
 cd your-messy-repo
-codeswarm init
+codeswarm init --model your-favorite-model
 
 # Run investigation
 codeswarm workflow investigate
@@ -36,20 +56,13 @@ codeswarm workflow fix-ui
 codeswarm pipeline cautious
 ```
 
-## Prerequisites
+## Ollama Cloud Integration
 
-1. **Ollama** - Install from https://ollama.com
+CodeSwarm can leverage **Ollama Cloud models** through Claude Code. To use a cloud-hosted model (like `gpt-oss:20b-cloud`), set the environment variable:
+
 ```bash
-curl -fsSL https://ollama.com/install.sh | sh
-ollama login  # For cloud models
+CLAUDE_CODE_OLLAMA_MODEL=gpt-oss:20b-cloud codeswarm workflow investigate
 ```
-
-2. **Claude Code** - Install from https://code.claude.com
-```bash
-curl -fsSL https://claude.ai/install.sh | bash
-```
-
-3. **Git** - For safety and version control
 
 ## Architecture
 
@@ -163,36 +176,6 @@ Edit `.codeswarm/config.json`:
 }
 ```
 
-## Workflows
-
-Workflows are sequences of coordinated agents:
-
-- **investigate**: Comprehensive code analysis
-- **cleanup**: Remove dead code
-- **fix-apis**: Connect and fix API calls
-- **fix-ui**: Fix UI interactions and responsiveness
-- **optimize**: Performance and code quality improvements
-- **validate**: Testing and QA
-
-## Pipelines
-
-Pipelines run multiple workflows in phases:
-
-### Cautious (Recommended for first run)
-1. Investigation → Find all issues
-2. Cleanup → Remove dead code
-3. Core Fixes → Fix APIs and UI
-4. Optimization → Improve quality
-5. Quality Assurance → Validate everything
-
-### Balanced
-1. Investigation
-2. Fixes (cleanup, APIs, UI together)
-3. Optimization & QA
-
-### Aggressive
-- All workflows in one phase (fast but risky)
-
 ## Safety Features
 
 - **Git-based rollback**: Every agent runs in isolated branch
@@ -233,29 +216,6 @@ $ codeswarm report --last
   Issues Resolved: 13
 ```
 
-## Custom Agents
-
-Create your own agent:
-
-```yaml
-# .codeswarm/agents/my-agent.yml
-name: My Custom Agent
-type: investigator
-risk_level: low
-model: qwen3-coder
-
-coordination:
-  enabled: true
-  capabilities: [custom-analysis]
-  shares_with: [other-agent]
-
-instructions: |
-  Your agent instructions here...
-
-output:
-  report: "reports/my-agent.md"
-```
-
 ## Troubleshooting
 
 **"Ollama not found"**
@@ -284,7 +244,7 @@ curl -fsSL https://claude.ai/install.sh | bash
 
 ## Contributing
 
-Issues and PRs welcome at https://github.com/O96a/codeswarm
+Issues and PRs welcome at [https://github.com/O96a/codeswarm](https://github.com/O96a/codeswarm)
 
 ## License
 
