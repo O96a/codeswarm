@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const GitManager = require('../git-manager');
+const GitManager = require('./git-manager');
 const chalk = require('chalk');
 
 async function rollback(session, options) {

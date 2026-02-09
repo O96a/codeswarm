@@ -2,16 +2,16 @@
 
 const { Command } = require('commander');
 const chalk = require('chalk');
-const packageJson = require('../package.json');
-const { initializeProject } = require('../lib/commands/init');
-const { listAgents } = require('../lib/commands/agents');
-const { runAgent } = require('../lib/commands/run');
-const { runWorkflow } = require('../lib/commands/workflow');
-const { runPipeline } = require('../lib/commands/pipeline');
-const { showReport } = require('../lib/commands/report');
-const { rollback } = require('../lib/commands/rollback');
-const { interactiveMode } = require('../lib/commands/interactive');
-const { showStatus } = require('../lib/commands/status');
+const packageJson = require('./package.json');
+const { initializeProject } = require('./init');
+const { listAgents } = require('./agents');
+const { runAgent } = require('./run');
+const { runWorkflow } = require('./workflow');
+const { runPipeline } = require('./pipeline');
+const { showReport } = require('./report');
+const { rollback } = require('./rollback');
+const { interactiveMode } = require('./interactive');
+const { showStatus } = require('./status');
 
 const program = new Command();
 
@@ -78,7 +78,7 @@ program
   .description('Show diffs from a session')
   .option('-l, --last', 'Show last session diff')
   .action(async (session, options) => {
-    const { showDiff } = require('../lib/commands/diff');
+    const { showDiff } = require('./diff');
     await showDiff(session, options);
   });
 
@@ -109,7 +109,7 @@ program
   .option('-g, --goal <description>', 'Overall goal for coordinated agents')
   .option('-a, --agents <agents...>', 'Specific agents to coordinate')
   .action(async (options) => {
-    const { coordinateAgents } = require('../lib/commands/coordinate');
+    const { coordinateAgents } = require('./coordinate');
     await coordinateAgents(options);
   });
 

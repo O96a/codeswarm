@@ -4,7 +4,7 @@
   "description": "Multi-agent AI code quality orchestration system powered by Claude Code and Ollama",
   "main": "lib/index.js",
   "bin": {
-    "codeswarm": "./bin/codeswarm.js"
+    "codeswarm": "./codeswarm.js"
   },
   "keywords": [
     "ai",

@@ -1,5 +1,5 @@
 const chalk = require('chalk');
-const Orchestrator = require('../orchestrator');
+const Orchestrator = require('./orchestrator');
 const fs = require('fs-extra');
 const path = require('path');
 

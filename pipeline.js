@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const Orchestrator = require('../orchestrator');
+const Orchestrator = require('./orchestrator');
 
 async function runPipeline(strategy, options) {
   const configPath = path.join(process.cwd(), '.codeswarm', 'config.json');
