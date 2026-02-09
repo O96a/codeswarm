@@ -32,9 +32,11 @@ async function initializeProject(options) {
     await fs.ensureDir(path.join(codeswarmDir, 'reports'));
 
     // Copy agent templates
-    const templatesDir = path.join(__dirname, '../../templates/agents');
-    if (await fs.pathExists(templatesDir)) {
-      await fs.copy(templatesDir, path.join(codeswarmDir, 'agents'));
+    const files = await fs.readdir(__dirname);
+    const agentFiles = files.filter(file => file.endsWith('.yml'));
+    
+    for (const file of agentFiles) {
+        await fs.copy(path.join(__dirname, file), path.join(codeswarmDir, 'agents', file));
     }
 
     // Create default config
