@@ -50,10 +50,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/codeswarm.git"
+    "url": "https://github.com/O96a/codeswarm.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/codeswarm/issues"
+    "url": "https://github.com/O96a/codeswarm/issues"
   },
-  "homepage": "https://github.com/yourusername/codeswarm#readme"
+  "homepage": "https://github.com/O96a/codeswarm#readme"
 }

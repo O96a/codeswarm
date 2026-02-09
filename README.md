@@ -284,7 +284,7 @@ curl -fsSL https://claude.ai/install.sh | bash
 
 ## Contributing
 
-Issues and PRs welcome at https://github.com/yourusername/codeswarm
+Issues and PRs welcome at https://github.com/O96a/codeswarm
 
 ## License
 
