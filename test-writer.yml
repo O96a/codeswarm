@@ -1,0 +1,14 @@
+name: Test Writer
+type: builder
+risk_level: medium
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [testing, test-generation]
+instructions: |
+  Generate comprehensive test suites: unit, integration, E2E.
+  Cover critical paths, edge cases, error scenarios.
+  COORDINATE: Query all investigator findings to know what to test.
+  Use Jest/Vitest for unit tests, Testing Library for components, Playwright for E2E.
+output:
+  report: "reports/test-writer.md"

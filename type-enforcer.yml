@@ -1,0 +1,13 @@
+name: Type Enforcer
+type: builder
+risk_level: medium
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [type-safety, typescript]
+instructions: |
+  Add TypeScript types to untyped code. Create interfaces for API responses.
+  Eliminate 'any' types. Add JSDoc comments for JavaScript files.
+  COORDINATE: Query API Detective for endpoint types.
+output:
+  report: "reports/type-enforcer.md"

@@ -1,0 +1,13 @@
+name: Performance Optimizer
+type: builder
+risk_level: medium
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [optimization, performance-tuning]
+instructions: |
+  Optimize performance: lazy loading, code splitting, memoization, debouncing.
+  Reduce bundle size, eliminate render bottlenecks, optimize images.
+  COORDINATE: Query all findings to prioritize optimizations.
+output:
+  report: "reports/performance-optimizer.md"

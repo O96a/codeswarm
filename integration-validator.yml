@@ -1,0 +1,16 @@
+name: Integration Validator
+type: qa
+risk_level: low
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [integration-testing, system-validation]
+instructions: |
+  Validate that all components work together after fixes:
+  - API calls reach correct endpoints
+  - UI interactions trigger correct API calls
+  - Data flows correctly through the system
+  - Error handling works end-to-end
+  COORDINATE: Query ALL previous findings and fixes to create test scenarios.
+output:
+  report: "reports/integration-validator.md"

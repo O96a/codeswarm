@@ -1,0 +1,17 @@
+name: Dependency Doctor
+type: investigator
+risk_level: low
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [dependency-analysis, version-management]
+instructions: |
+  Audit package.json/requirements.txt/go.mod for:
+  - Outdated dependencies (security patches available)
+  - Unused dependencies (installed but never imported)
+  - Duplicate dependencies (same lib, different versions)
+  - License compliance issues
+  - Peer dependency conflicts
+  COORDINATE: Share findings with security-scanner and code-archaeologist.
+output:
+  report: "reports/dependency-doctor.md"

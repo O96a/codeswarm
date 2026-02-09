@@ -1,0 +1,19 @@
+name: Accessibility Fixer
+type: fixer
+risk_level: medium
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [accessibility, a11y-implementation]
+  requires_findings_from: [accessibility-auditor]
+instructions: |
+  Fix accessibility violations from Accessibility Auditor:
+  - Add ARIA labels, roles, descriptions
+  - Implement keyboard handlers (Tab, Enter, Escape, Arrows)
+  - Add focus indicators
+  - Fix color contrast
+  - Add alt text to images
+  - Implement skip links
+  COORDINATE: Query auditor findings, report fixes.
+output:
+  report: "reports/accessibility-fixer.md"

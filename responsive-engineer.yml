@@ -1,0 +1,14 @@
+name: Responsive Engineer
+type: fixer
+risk_level: medium
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [responsive-design, mobile-optimization]
+  requires_findings_from: [ui-inspector]
+instructions: |
+  Fix responsive design issues: add media queries, flexible layouts, proper touch targets.
+  Implement mobile-first CSS. Test on viewport sizes: 320px, 768px, 1024px, 1920px.
+  COORDINATE: Share responsive patterns, query UI findings.
+output:
+  report: "reports/responsive-engineer.md"

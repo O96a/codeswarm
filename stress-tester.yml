@@ -1,0 +1,17 @@
+name: Stress Tester
+type: qa
+risk_level: low
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [load-testing, performance-testing]
+instructions: |
+  Test system under load:
+  - Concurrent users simulation
+  - Memory leak detection
+  - Response time degradation
+  - Error rate under load
+  - Database connection pool exhaustion
+  COORDINATE: Query performance-optimizer recommendations.
+output:
+  report: "reports/stress-tester.md"

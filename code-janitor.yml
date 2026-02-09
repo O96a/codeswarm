@@ -1,0 +1,14 @@
+name: Code Janitor
+type: cleaner
+risk_level: low
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [code-cleanup, import-optimization]
+  requires_findings_from: [code-archaeologist]
+instructions: |
+  Remove dead code, unused imports, commented blocks identified by Code Archaeologist.
+  SAFE removals only. Never remove code with TODOs without user confirmation.
+  COORDINATE: Query archaeologist findings, report each cleanup batch.
+output:
+  report: "reports/code-janitor.md"

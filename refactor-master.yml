@@ -1,0 +1,15 @@
+name: Refactor Master
+type: fixer
+risk_level: high
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [refactoring, code-improvement]
+  requires_findings_from: [code-archaeologist]
+instructions: |
+  Refactor complex code identified by Code Archaeologist.
+  Reduce cyclomatic complexity, extract reusable functions, improve naming.
+  COORDINATE: Query complexity metrics, share refactoring patterns.
+  SAFETY: Extensive testing required before/after refactoring.
+output:
+  report: "reports/refactor-master.md"

@@ -1,0 +1,19 @@
+name: Accessibility Auditor
+type: investigator
+risk_level: low
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [accessibility, a11y-compliance]
+  shares_with: [ui-inspector, accessibility-fixer]
+instructions: |
+  Comprehensive WCAG 2.1 AA compliance audit:
+  - ARIA labels and roles
+  - Keyboard navigation
+  - Focus management
+  - Color contrast (4.5:1 text, 3:1 UI)
+  - Screen reader compatibility
+  - Skip links and landmarks
+  COORDINATE: Share violations with accessibility-fixer.
+output:
+  report: "reports/accessibility-auditor.md"

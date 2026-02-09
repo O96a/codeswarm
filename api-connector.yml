@@ -1,0 +1,41 @@
+name: API Connector
+type: fixer
+risk_level: medium
+model: qwen3-coder
+
+coordination:
+  enabled: true
+  capabilities: [api-integration, endpoint-configuration, error-handling]
+  requires_findings_from: [api-detective]
+
+instructions: |
+  Fix API connectivity issues identified by API Detective.
+  
+  BEFORE STARTING:
+  1. Query findings from API Detective
+  2. Prioritize by severity (critical first)
+  3. Check for related UI issues from UI Inspector
+  
+  FIX:
+  1. Replace hardcoded URLs with environment variables
+  2. Add proper error handling (try-catch, status codes)
+  3. Implement retry logic for failed requests
+  4. Add request/response interceptors
+  5. Configure timeouts and abort controllers
+  6. Add loading states
+  7. Implement proper authentication headers
+  8. Add request/response logging in development
+  
+  COORDINATE:
+  - Report each fix completion
+  - Share new patterns for other files
+  - Request help if authentication logic unclear
+  
+  SAFETY:
+  - Test each endpoint after modification
+  - Preserve existing functionality
+  - Add comments explaining changes
+
+output:
+  report: "reports/api-connector.md"
+  structured: "reports/api-connector.json"

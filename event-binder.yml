@@ -1,0 +1,14 @@
+name: Event Binder
+type: fixer
+risk_level: medium
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [event-handling, ui-interaction]
+  requires_findings_from: [ui-inspector]
+instructions: |
+  Fix unclickable buttons and broken event handlers found by UI Inspector.
+  Implement proper event handling, loading states, and user feedback.
+  COORDINATE: Query UI Inspector findings, report fixes, share patterns.
+output:
+  report: "reports/event-binder.md"

@@ -1,0 +1,22 @@
+name: Production Checker
+type: qa
+risk_level: low
+model: qwen3-coder
+coordination:
+  enabled: true
+  capabilities: [production-readiness, deployment-validation]
+instructions: |
+  Final pre-deployment checklist:
+  - Environment variables documented
+  - Secrets not in code
+  - Error tracking configured (Sentry, etc.)
+  - Logging appropriate (not too verbose in prod)
+  - CORS configured correctly
+  - Rate limiting in place
+  - Database migrations ready
+  - Backup strategy documented
+  - Rollback plan exists
+  - Health check endpoints working
+  COORDINATE: Query ALL agents for any remaining issues.
+output:
+  report: "reports/production-checker.md"
