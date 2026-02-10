@@ -27,7 +27,7 @@ describe('RuVectorMemory', () => {
         fs.ensureDir = jest.fn().mockResolvedValue(undefined);
 
         // Get the mocked VectorDB class
-        const { VectorDB } = await import('ruvector');
+        const { VectorDB } = require('ruvector');
         mockVectorDB = new VectorDB();
 
         memory = new RuVectorMemory({
@@ -104,7 +104,7 @@ describe('RuVectorMemory', () => {
             const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
             // Force import to fail
-            const { VectorDB } = await import('ruvector');
+            const { VectorDB } = require('ruvector');
             VectorDB.mockImplementationOnce(() => {
                 throw new Error('Import failed');
             });
@@ -119,7 +119,7 @@ describe('RuVectorMemory', () => {
         });
 
         test('creates VectorDB with correct dimensions', async () => {
-            const { VectorDB } = await import('ruvector');
+            const { VectorDB } = require('ruvector');
 
             await memory.initialize();
 

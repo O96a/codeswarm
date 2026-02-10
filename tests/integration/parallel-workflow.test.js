@@ -3,6 +3,21 @@ const fs = require('fs-extra');
 const path = require('path');
 const yaml = require('yaml');
 
+// Mock ui-formatter — it depends on boxen@8 (ESM-only) which Jest can't load
+jest.mock('../../ui-formatter', () => ({
+    header: jest.fn(),
+    section: jest.fn(),
+    divider: jest.fn(),
+    phase: jest.fn(),
+    item: jest.fn(),
+    agentStart: jest.fn(),
+    progress: jest.fn(),
+    success: jest.fn(),
+    error: jest.fn(),
+    warning: jest.fn(),
+    icons: { success: '✓', error: '✗', warning: '⚠', info: 'ℹ', run: '▶', done: '●', arrow: '→', bullet: '•', check: '✔', cross: '✖', star: '★', rocket: '🚀', gear: '⚙' },
+}));
+
 describe('Parallel Workflow Integration', () => {
     let orchestrator;
     const testDir = path.join(process.cwd(), '.test-mehaisi-parallel');

@@ -5,3 +5,4 @@ node_modules/
 .codeswarm/sessions/
 .codeswarm/temp/
 package-lock.json
+\n# Ignore local vector DB\nruvector.db

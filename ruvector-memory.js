@@ -27,8 +27,8 @@ class RuVectorMemory {
         if (this.initialized) return;
 
         try {
-            // Dynamically import ruvector (ES module)
-            const { VectorDB } = await import('ruvector');
+            // Import ruvector (supports both CJS require and ESM import)
+            const { VectorDB } = require('ruvector');
 
             // Ensure storage directory exists
             await fs.ensureDir(this.dbPath);

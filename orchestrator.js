@@ -140,6 +140,15 @@ class Orchestrator {
       // Create rollback point
       rollbackPoint = await this.createRollbackPoint(agentName);
 
+      // ── Capture baseline tests BEFORE agent execution ──────────────────
+      if (this.config.safety.require_tests && !options.skipTests) {
+        try {
+          await this.safetyManager.captureBaseline();
+        } catch (baselineErr) {
+          console.log(chalk.yellow(`  ⚠ Baseline capture failed: ${baselineErr.message} (continuing)\n`));
+        }
+      }
+
       // Load agent configuration with validation
       const agentConfig = await this.loadAgentConfig(agentName);
       const validation = this.validator.validateAgentConfig(agentConfig);
@@ -175,14 +184,36 @@ class Orchestrator {
         }
       }
 
-      // Validate results
+      // ── Run tests with intelligent failure handling ────────────────────
       if (this.config.safety.require_tests && !options.skipTests) {
         try {
-          const testSuccess = await this.safetyManager.runTests();
-          this.metrics.recordTestExecution(testSuccess);
+          const testResult = await this.safetyManager.runTests();
+
+          // runTests now returns a result object instead of just boolean
+          const passed = testResult === true || testResult?.passed === true;
+          this.metrics.recordTestExecution(passed);
+
+          if (!passed && testResult?.preExisting) {
+            // Pre-existing failure — don't blame the agent
+            console.log(chalk.yellow(`  ℹ Tests have a pre-existing failure (${testResult.diagnosis?.category}) — agent changes preserved\n`));
+          } else if (!passed && testResult?.isAgentFault === false) {
+            // Environment/infra issue — don't rollback
+            console.log(chalk.yellow(`  ℹ Test failure is environmental (${testResult.diagnosis?.category}) — agent changes preserved\n`));
+          } else if (!passed) {
+            // Actual agent-caused failure — will be thrown from runTests
+            // This path is reached if rollback_on_failure is disabled
+          }
         } catch (testError) {
           this.metrics.recordTestExecution(false);
-          throw testError;
+
+          // Check if the error has diagnosis info (from enhanced safety-manager)
+          if (testError.diagnosis && !testError.isAgentFault) {
+            // Not the agent's fault — log but DON'T throw / rollback
+            console.log(chalk.yellow(`\n  ⚠ Tests failed due to ${testError.diagnosis.category}, not agent changes`));
+            console.log(chalk.yellow(`  ⚠ Agent changes are preserved. Resolve the environment issue separately.\n`));
+          } else {
+            throw testError;
+          }
         }
       } else if (options.skipTests) {
         this.metrics.recordTestSkipped('Skipped via options');
