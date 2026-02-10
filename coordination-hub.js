@@ -3,6 +3,8 @@ const path = require('path');
 const chalk = require('chalk');
 const { v4: uuidv4 } = require('uuid');
 const RuVectorMemory = require('./ruvector-memory');
+const HooksCollector = require('./hooks-collector');
+const SONALearner = require('./sona-learner');
 
 /**
  * CoordinationHub enables agents to:
@@ -11,6 +13,7 @@ const RuVectorMemory = require('./ruvector-memory');
  * 3. Avoid duplicate work
  * 4. Build on each other's work
  * 5. Escalate issues that need human intervention
+ * 6. Learn from interactions to improve routing (SONA)
  */
 class CoordinationHub {
   constructor(sessionDir, config = {}) {
@@ -33,6 +36,21 @@ class CoordinationHub {
       embedding_model: config.embedding_model || 'nomic-embed-text',
       dimSize: 384
     });
+
+    // Initialize hooks collector for capturing interaction data
+    this.hooksCollector = new HooksCollector(sessionDir, {
+      enabled: config.learning?.enabled !== false,
+      capture_file_operations: config.learning?.capture_file_operations,
+      capture_commands: config.learning?.capture_commands,
+      capture_coordination: config.learning?.capture_coordination
+    });
+
+    // Initialize SONA learner for routing optimization
+    const mehaisiDir = path.dirname(sessionDir);
+    this.sonaLearner = new SONALearner(mehaisiDir, {
+      min_sessions_for_learning: config.learning?.min_sessions_for_learning,
+      auto_adjust_weights: config.learning?.auto_adjust_weights
+    });
   }
 
   async initialize() {
@@ -46,6 +64,26 @@ class CoordinationHub {
     } catch (error) {
       console.warn(chalk.yellow(`  ⚠ Vector memory initialization failed: ${error.message}`));
       console.warn(chalk.yellow('  → Coordination will work but without semantic search capabilities'));
+    }
+
+    // Initialize hooks collector for learning
+    try {
+      await this.hooksCollector.initialize();
+      if (this.hooksCollector.enabled) {
+        console.log(chalk.gray('  ✓ Hooks collector initialized for interaction capture'));
+      }
+    } catch (error) {
+      console.warn(chalk.yellow(`  ⚠ Hooks collector initialization failed: ${error.message}`));
+    }
+
+    // Initialize SONA learner
+    try {
+      await this.sonaLearner.initialize();
+      if (this.sonaLearner.initialized) {
+        console.log(chalk.gray('  ✓ SONA learner initialized for routing optimization'));
+      }
+    } catch (error) {
+      console.warn(chalk.yellow(`  ⚠ SONA learner initialization failed: ${error.message}`));
     }
   }
 
@@ -446,11 +484,25 @@ class CoordinationHub {
       };
     }
 
+    // Capture routing decision for learning
+    if (this.hooksCollector && this.hooksCollector.enabled) {
+      await this.hooksCollector.captureEvent('routing:decision', {
+        task: issue.title || issue.description,
+        taskType: issue.type || this.inferCapability(issue),
+        selectedAgent: topAgent.agent.name,
+        selectedAgentId: topAgent.agent.id,
+        confidence: topAgent.score.total,
+        reason: topAgent.score.reason,
+        alternatives: alternatives.map(a => a.name)
+      });
+    }
+
     return {
       agent: topAgent.agent,
       confidence: topAgent.score.total,
       reason: topAgent.score.reason,
-      alternatives
+      alternatives,
+      _routingId: Date.now() // Used to correlate with outcome later
     };
   }
 
@@ -463,6 +515,11 @@ class CoordinationHub {
    */
   async scoreAgentForIssue(agent, issue, options = {}) {
     const { useSemanticSearch = true } = options;
+    
+    // Get learned routing weights from SONA (fallback to defaults)
+    const weights = this.sonaLearner && this.sonaLearner.initialized
+      ? this.sonaLearner.routingWeights
+      : { capability: 0.4, semantic: 0.4, success: 0.2 };
     
     let capabilityScore = 0;
     let semanticScore = 0;
@@ -517,11 +574,11 @@ class CoordinationHub {
       }
     }
 
-    // Calculate weighted total
+    // Calculate weighted total using learned weights
     const total = (
-      capabilityScore * 0.4 +
-      semanticScore * 0.4 +
-      successScore * 0.2
+      capabilityScore * weights.capability +
+      semanticScore * weights.semantic +
+      successScore * weights.success
     );
 
     return {
@@ -529,6 +586,7 @@ class CoordinationHub {
       capability: capabilityScore,
       semantic: semanticScore,
       success: successScore,
+      weights, // Include weights used for transparency
       reason: reasons.length > 0 ? reasons.join(', ') : 'no specific match'
     };
   }
@@ -823,6 +881,94 @@ class CoordinationHub {
       console.log(chalk.gray(`    ℹ Semantic search failed: ${error.message}`));
       return [];
     }
+  }
+
+  /**
+   * Record routing outcome for learning
+   * @param {Object} routing - Original routing decision from selectBestAgent
+   * @param {boolean} success - Whether the agent succeeded
+   * @param {number} duration - How long the agent took
+   * @param {Object} metadata - Additional outcome data
+   */
+  async recordRoutingOutcome(routing, success, duration, metadata = {}) {
+    if (!this.sonaLearner || !this.sonaLearner.initialized) {
+      return;
+    }
+
+    const outcome = {
+      task: routing.task || metadata.task,
+      taskType: routing.taskType || metadata.taskType,
+      agent: routing.agent,
+      agentId: routing.agent?.id,
+      agentName: routing.agent?.name,
+      confidence: routing.confidence,
+      success,
+      duration,
+      ...metadata
+    };
+
+    await this.sonaLearner.recordRoutingOutcome(outcome);
+
+    // Capture hooks event
+    if (this.hooksCollector && this.hooksCollector.enabled) {
+      await this.hooksCollector.captureEvent('routing:outcome', {
+        agentId: routing.agent?.id,
+        agentName: routing.agent?.name,
+        success,
+        duration,
+        confidence: routing.confidence,
+        task: outcome.task,
+        taskType: outcome.taskType
+      });
+    }
+  }
+
+  /**
+   * Optimize routing weights based on learned data
+   * Called periodically or on demand
+   */
+  async optimizeRoutingWeights() {
+    if (!this.sonaLearner || !this.sonaLearner.initialized) {
+      return null;
+    }
+
+    try {
+      const optimizedWeights = await this.sonaLearner.optimizeWeights();
+      return optimizedWeights;
+    } catch (error) {
+      console.warn(chalk.yellow(`⚠ Weight optimization failed: ${error.message}`));
+      return null;
+    }
+  }
+
+  /**
+   * Get learning statistics
+   */
+  async getLearningStats() {
+    if (!this.sonaLearner || !this.sonaLearner.initialized) {
+      return { enabled: false };
+    }
+
+    return await this.sonaLearner.getStatistics();
+  }
+
+  /**
+   * Cleanup coordination hub - flush buffers, save state
+   */
+  async cleanup() {
+    // Flush hooks collector
+    if (this.hooksCollector) {
+      await this.hooksCollector.cleanup();
+    }
+
+    // Optimize routing weights if enough data
+    if (this.sonaLearner && this.sonaLearner.initialized) {
+      await this.sonaLearner.optimizeWeights();
+      await this.sonaLearner.saveLearningData();
+    }
+
+    // Save coordination state
+    await this.saveState();
   }
 }
 

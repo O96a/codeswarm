@@ -121,6 +121,50 @@ program
     await coordinateAgents(options);
   });
 
+// Learning command
+program
+  .command('learning <action>')
+  .description('Manage self-learning system (SONA)')
+  .option('--history', 'Show weight adjustment history')
+  .option('--patterns', 'Show learned task patterns')
+  .option('--capabilities', 'Show discovered capabilities')
+  .option('--format <type>', 'Export format (json)', 'json')
+  .option('--capability <value>', 'Capability weight (for set action)')
+  .option('--semantic <value>', 'Semantic weight (for set action)')
+  .option('--success <value>', 'Success weight (for set action)')
+  .action(async (action, options) => {
+    const {
+      showLearningDashboard,
+      showLearningStats,
+      manageWeights,
+      exportLearningData
+    } = require('./learning-dashboard');
+
+    switch (action) {
+      case 'dashboard':
+        await showLearningDashboard(options);
+        break;
+      case 'stats':
+        await showLearningStats();
+        break;
+      case 'weights':
+        await manageWeights('show');
+        break;
+      case 'weights:reset':
+        await manageWeights('reset');
+        break;
+      case 'weights:set':
+        await manageWeights('set', options);
+        break;
+      case 'export':
+        await exportLearningData(options.format);
+        break;
+      default:
+        console.log(chalk.red(`\nUnknown learning action: ${action}\n`));
+        console.log(chalk.yellow('Available actions: dashboard, stats, weights, weights:reset, weights:set, export'));
+    }
+  });
+
 // Error handling
 program.on('command:*', () => {
   console.error(chalk.red(`\nInvalid command: ${program.args.join(' ')}\n`));

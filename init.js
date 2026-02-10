@@ -83,6 +83,20 @@ async function initializeProject(options) {
         pause_on_error: true,
         auto_commit: false
       },
+      coordination: {
+        enabled: true,
+        learning: {
+          enabled: true,                      // Enable SONA self-learning
+          capture_file_operations: true,      // Capture file edits for learning
+          capture_commands: true,             // Capture command execution
+          capture_coordination: true,         // Capture agent coordination events
+          min_sessions_for_learning: 5,       // Minimum sessions before weight optimization
+          auto_adjust_weights: true,          // Automatically optimize routing weights
+          min_success_count_for_capability: 3, // Minimum successes to discover capability
+          confidence_threshold: 0.7,          // Confidence threshold for patterns
+          max_weight_shift: 0.1               // Maximum weight change per optimization (10%)
+        }
+      },
       project_context: {
         type: options.template || 'node',
         test_command: 'npm test',

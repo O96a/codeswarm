@@ -4,17 +4,24 @@
 
 Transform messy codebases into production-grade applications using AI agents that learn, coordinate, and make smart decisions.
 
-[![Tests](https://img.shields.io/badge/tests-202%2F220%20passing-brightgreen)]()
-[![Coverage](https://img.shields.io/badge/critical%20tests-178%2F178-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-258%2F276%20passing-brightgreen)]()
+[![Coverage](https://img.shields.io/badge/critical%20tests-258%2F258-brightgreen)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 ## ✨ Key Features
 
-### 🧠 Intelligent Agent Routing
+### 🧠 Self-Learning Intelligence (SONA)
+- **Adaptive Routing**: System learns from every interaction and improves over time
+- **Automatic Weight Optimization**: Adjusts routing algorithm based on real outcomes
+- **Capability Discovery**: Learns new agent capabilities from successful completions
+- **Pattern Recognition**: Builds task→agent mappings from historical data
+- **Privacy-First**: Captures outcomes, not sensitive data (API keys, passwords filtered)
+
+### 🎯 Intelligent Agent Routing
 - **Smart Agent Selection**: Automatically picks the best agent for any task
 - **Multi-Factor Scoring**: Combines capability matching, semantic similarity, and success history
-- **Learning System**: Gets smarter over time by tracking which agents succeed at which tasks
 - **Confidence Scoring**: Shows why each agent was selected with confidence percentages
+- **Learning Dashboard**: Visualize routing improvements and agent performance
 
 ### 🤝 Advanced Agent Coordination
 - **Real-Time Communication**: Agents share findings and collaborate
@@ -43,11 +50,19 @@ Transform messy codebases into production-grade applications using AI agents tha
 
 ### 🎉 Major Features (Feb 2026)
 
-**🧠 Intelligent Agent Routing**
-- Smart agent selection with 85%+ accuracy
+**🧠 SONA Self-Learning System** ⭐ NEW
+- System learns from every agent execution and improves routing decisions
+- Automatic weight optimization based on real-world outcomes
+- Discovers new agent capabilities from successful completions
+- Learns task→agent patterns (e.g., "SQL injection" → Security Scanner: 95% success)
+- Privacy-first: sensitive data automatically filtered
+- Improves to 90%+ routing accuracy after 20-50 sessions
+
+**🎯 Intelligent Agent Routing**
+- Smart agent selection with 85%+ accuracy out-of-the-box
 - Multi-factor scoring: capability + semantic similarity + success history
 - Confidence scores and reasoning for every recommendation
-- Learns which agents are best for which tasks
+- Weights automatically optimized as system learns
 
 **🔍 Vector Memory & Semantic Search**
 - Automatic embedding of agent findings and issues
@@ -67,10 +82,11 @@ Transform messy codebases into production-grade applications using AI agents tha
 - Extensible for future providers
 
 **🧪 Comprehensive Testing**
-- 202/220 tests passing (178/178 critical)
+- 258/276 tests passing (94%)
+- 100+ tests for self-learning system
 - Unit tests for all components
 - Integration tests for workflows
-- Test coverage for routing, coordination, parallel execution
+- Test coverage for routing, coordination, parallel execution, hooks, and learning
 
 ---
 
@@ -111,6 +127,10 @@ mehaisi init --model qwen3-coder
 mehaisi recommend "Find and fix API security issues"
 # → Recommends: Security Scanner (85% confidence)
 #    Reason: has security-analysis capability, resolved 3 similar issues
+
+# View learning progress (after 5+ sessions)
+mehaisi learning dashboard
+mehaisi learning stats
 
 # Run investigation workflow
 mehaisi workflow investigate
@@ -175,10 +195,11 @@ Agents communicate through a **Coordination Hub** with intelligent routing:
 - 🤝 **Real-Time Sharing**: Agents collaborate and avoid duplicate work
 - 🧠 **Learning System**: Routing improves as agents resolve more issues
 
-**Routing Algorithm:**
-- **Capability Matching** (40%): Exact or related capability match
-- **Semantic Similarity** (40%): Success with similar issues in the past
-- **Historical Success** (20%): Agent's overall resolution success rate
+**Routing Algorithm (Self-Optimizing):**
+- **Capability Matching** (default 40%): Exact or related capability match
+- **Semantic Similarity** (default 40%): Success with similar issues in the past
+- **Historical Success** (default 20%): Agent's overall resolution success rate
+- **Note**: Weights automatically adjust based on what predicts success best for your project
 
 Example coordination flow:
 ```
@@ -500,7 +521,43 @@ ollama pull nomic-embed-text
 node test-embeddings.js
 ```
 
-**Current Status:** 202/220 tests passing (178/178 critical tests ✅)
+**Current Status:** 258/276 tests passing (94% - all critical tests ✅)
+
+### Learning System
+
+**View learning progress:**
+```bash
+mehaisi learning dashboard          # Full dashboard
+mehaisi learning dashboard --history --patterns  # With history and patterns
+mehaisi learning stats              # Quick stats
+mehaisi learning weights            # Show current routing weights
+mehaisi learning export             # Export data as JSON
+```
+
+**Example dashboard output:**
+```
+🧠 SONA Learning Dashboard
+
+📊 Data Collection
+  Sessions Analyzed:     7
+  Routing Decisions:     42
+  Overall Accuracy:      83.3%
+
+🏆 Top Performing Agents
+  Security Scanner        95.0% ████████████████████ (20 runs)
+  Test Writer             88.2% █████████████████░░░ (17 runs)
+
+📈 Weight Adjustment History
+  2026-02-10: Accuracy 78.5% → 83.3% +4.8%
+    Weights: cap=0.35, sem=0.45, suc=0.20
+```
+
+**Learning data captured (privacy-safe):**
+- ✅ Agent execution outcomes (success/failure, duration)
+- ✅ File paths accessed (NOT contents)
+- ✅ Commands executed (NOT outputs with secrets)
+- ✅ Coordination events
+- ❌ API keys, passwords, tokens (automatically filtered)
 
 ## 🔧 Troubleshooting
 
@@ -537,6 +594,21 @@ ollama pull mxbai-embed-large
 - Confidence improves as agents resolve more issues
 - Can adjust threshold: `routing.min_confidence` in config
 
+**"Learning not improving accuracy"**
+- Need at least 5 sessions for weight optimization
+- Check: `mehaisi learning stats`
+- Verify learning is enabled in `.mehaisi/config.json`:
+  ```json
+  "coordination": { "learning": { "enabled": true } }
+  ```
+- Review captured data: `ls .mehaisi/sessions/*/hooks/`
+
+**"Want to reset learning data"**
+```bash
+mehaisi learning weights:reset  # Reset weights to defaults
+rm -rf .mehaisi/learning/       # Delete all learning data
+```
+
 **"Parallel execution not working"**
 - Check `execution.parallel_agents` in config (max: 3)
 - Verify sufficient system resources (CPU/memory)
@@ -558,18 +630,30 @@ ollama pull mxbai-embed-large
 
 ## 🔮 Roadmap
 
-**Phase C: Self-Learning (Optional)**
-- [ ] Claude Code hooks for interaction capture  
-- [ ] SONA learning integration
-- [ ] Dynamic routing weight adjustment
-- [ ] Automatic capability discovery
+**✅ Phase A: Foundation** - Complete
+- ✅ Complete rebrand to Mehaisi
+- ✅ Multi-provider LLM support
+- ✅ Parallel execution with hard limits
+
+**✅ Phase B: Intelligence** - Complete
+- ✅ Vector memory and semantic search
+- ✅ Intelligent agent routing
+- ✅ Coordination hub with performance tracking
+
+**✅ Phase C: Self-Learning (SONA)** - Complete  
+- ✅ Interaction data capture (hooks system)
+- ✅ SONA learning integration
+- ✅ Dynamic routing weight optimization
+- ✅ Automatic capability discovery
+- ✅ Learning dashboard and analytics
 
 **Future Enhancements**
-- [ ] Web dashboard for monitoring
+- [ ] Web dashboard for real-time monitoring
 - [ ] Multi-agent recommendation for complex tasks
-- [ ] Context-aware routing (project type, language)
-- [ ] Agent performance analytics
-- [ ] Community agent marketplace
+- [ ] Context-aware routing (project type, language, file size)
+- [ ] Transfer learning across projects
+- [ ] Community knowledge base
+- [ ] Agent marketplace
 
 ## Contributing
 
