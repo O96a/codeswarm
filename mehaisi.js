@@ -116,6 +116,22 @@ program
     await credManager.setupAllCredentials();
   });
 
+// Config command
+program
+  .command('config')
+  .description('Configure Mehaisi settings')
+  .option('-l, --list', 'Display current configuration')
+  .option('-i, --interactive', 'Interactive configuration mode')
+  .option('--auto-apply <boolean>', 'Enable/disable auto-apply (true/false)', (val) => val === 'true')
+  .option('--require-tests <boolean>', 'Require tests to pass (true/false)', (val) => val === 'true')
+  .option('--rollback-on-failure <boolean>', 'Auto-rollback on failure (true/false)', (val) => val === 'true')
+  .option('--model <model>', 'Change default model')
+  .option('--provider <provider>', 'Change default provider')
+  .action(async (options) => {
+    const { configureSettings } = require('./config-manager');
+    await configureSettings(options);
+  });
+
 // Interactive mode
 program
   .command('interactive')
