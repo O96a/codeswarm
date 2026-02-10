@@ -5,17 +5,17 @@ const ora = require('ora');
 const inquirer = require('inquirer');
 
 async function initializeProject(options) {
-  console.log(chalk.blue.bold('\n🎯 Initializing CodeSwarm\n'));
+  console.log(chalk.blue.bold('\n🎯 Initializing Mehaisi\n'));
 
   const cwd = process.cwd();
-  const codeswarmDir = path.join(cwd, '.codeswarm');
+  const mehaisiDir = path.join(cwd, '.mehaisi');
 
   // Check if already initialized
-  if (await fs.pathExists(codeswarmDir)) {
+  if (await fs.pathExists(mehaisiDir)) {
     const { reinit } = await inquirer.prompt([{
       type: 'confirm',
       name: 'reinit',
-      message: 'CodeSwarm already initialized. Reinitialize?',
+      message: 'Mehaisi already initialized. Reinitialize?',
       default: false
     }]);
     if (!reinit) return;
@@ -25,25 +25,47 @@ async function initializeProject(options) {
 
   try {
     // Create directory structure
-    await fs.ensureDir(path.join(codeswarmDir, 'agents'));
-    await fs.ensureDir(path.join(codeswarmDir, 'workflows'));
-    await fs.ensureDir(path.join(codeswarmDir, 'pipelines'));
-    await fs.ensureDir(path.join(codeswarmDir, 'sessions'));
-    await fs.ensureDir(path.join(codeswarmDir, 'reports'));
+    await fs.ensureDir(path.join(mehaisiDir, 'agents'));
+    await fs.ensureDir(path.join(mehaisiDir, 'workflows'));
+    await fs.ensureDir(path.join(mehaisiDir, 'pipelines'));
+    await fs.ensureDir(path.join(mehaisiDir, 'sessions'));
+    await fs.ensureDir(path.join(mehaisiDir, 'reports'));
 
     // Copy agent templates
     const files = await fs.readdir(__dirname);
     const agentFiles = files.filter(file => file.endsWith('.yml'));
-    
+
     for (const file of agentFiles) {
-        await fs.copy(path.join(__dirname, file), path.join(codeswarmDir, 'agents', file));
+      await fs.copy(path.join(__dirname, file), path.join(mehaisiDir, 'agents', file));
     }
 
-    // Create default config
+    // Create default config with LLM provider abstraction
     const config = {
-      model: options.model || 'qwen3-coder',
-      context_window: 128000,
-      ollama_url: 'http://localhost:11434',
+      model: options.model || 'kimi-k2.5:cloud',
+      ollama_url: 'https://api.ollama.com',  // Ollama Cloud by default
+      llm: {
+        default_provider: 'claude-code',
+        providers: {
+          'ollama-cloud': {
+            type: 'ollama',
+            url: 'https://api.ollama.com',
+            model: 'kimi-k2.5:cloud',
+            priority: 1
+          },
+          'ollama-local': {
+            type: 'ollama',
+            url: 'http://localhost:11434',
+            model: 'kimi-k2.5',
+            priority: 2,
+            fallback: true
+          },
+          'claude-code': {
+            type: 'claude-cli',
+            model: 'kimi-k2.5:cloud',
+            timeout: 600000
+          }
+        }
+      },
       safety: {
         auto_apply: false,
         require_tests: true,
@@ -52,7 +74,12 @@ async function initializeProject(options) {
         rollback_on_failure: true
       },
       execution: {
-        parallel_agents: 1,
+        parallel_agents: 3,          // Max 3 parallel Claude instances (hard limit)
+        max_claude_instances: 3,     // Hard limit, cannot be exceeded
+        instance_timeout: 600000,    // 10 min timeout
+        batch_cooldown: 2000,        // 2 sec cooldown between batches
+        max_retries: 2,             // Max 2 retries per agent
+        session_timeout: 3600000,    // 1 hour max session
         pause_on_error: true,
         auto_commit: false
       },
@@ -64,25 +91,25 @@ async function initializeProject(options) {
       }
     };
 
-    await fs.writeJSON(path.join(codeswarmDir, 'config.json'), config, { spaces: 2 });
+    await fs.writeJSON(path.join(mehaisiDir, 'config.json'), config, { spaces: 2 });
 
     // Create default workflows
-    await createDefaultWorkflows(codeswarmDir);
+    await createDefaultWorkflows(mehaisiDir);
 
     // Create default pipelines
-    await createDefaultPipelines(codeswarmDir);
+    await createDefaultPipelines(mehaisiDir);
 
     // Create .gitignore entry
     const gitignorePath = path.join(cwd, '.gitignore');
     if (await fs.pathExists(gitignorePath)) {
       let gitignore = await fs.readFile(gitignorePath, 'utf8');
-      if (!gitignore.includes('.codeswarm/sessions')) {
-        gitignore += '\n\n# CodeSwarm\n.codeswarm/sessions/\n.codeswarm/reports/\n';
+      if (!gitignore.includes('.mehaisi/sessions')) {
+        gitignore += '\n\n# Mehaisi\n.mehaisi/sessions/\n.mehaisi/reports/\n';
         await fs.writeFile(gitignorePath, gitignore);
       }
     }
 
-    spinner.succeed('CodeSwarm initialized successfully!');
+    spinner.succeed('Mehaisi initialized successfully!');
 
     console.log(chalk.green('\n✓ Directory structure created'));
     console.log(chalk.green(`✓ ${chalk.bold('19')} agents configured`));
@@ -90,11 +117,11 @@ async function initializeProject(options) {
     console.log(chalk.green('✓ Default pipelines created'));
 
     console.log(chalk.blue('\n📚 Next steps:'));
-    console.log(chalk.white('  1. codeswarm agents --list'));
-    console.log(chalk.white('  2. codeswarm run api-detective'));
-    console.log(chalk.white('  3. codeswarm workflow investigate'));
+    console.log(chalk.white('  1. mehaisi agents --list'));
+    console.log(chalk.white('  2. mehaisi run api-detective'));
+    console.log(chalk.white('  3. mehaisi workflow investigate'));
     console.log(chalk.white('\nOr run the full pipeline:'));
-    console.log(chalk.white('  codeswarm pipeline cautious\n'));
+    console.log(chalk.white('  mehaisi pipeline cautious\n'));
 
   } catch (error) {
     spinner.fail('Initialization failed');
@@ -103,7 +130,7 @@ async function initializeProject(options) {
   }
 }
 
-async function createDefaultWorkflows(codeswarmDir) {
+async function createDefaultWorkflows(mehaisiDir) {
   const workflows = {
     investigate: {
       name: 'investigate',
@@ -170,14 +197,14 @@ async function createDefaultWorkflows(codeswarmDir) {
 
   for (const [name, workflow] of Object.entries(workflows)) {
     await fs.writeJSON(
-      path.join(codeswarmDir, 'workflows', `${name}.json`),
+      path.join(mehaisiDir, 'workflows', `${name}.json`),
       workflow,
       { spaces: 2 }
     );
   }
 }
 
-async function createDefaultPipelines(codeswarmDir) {
+async function createDefaultPipelines(mehaisiDir) {
   const pipelines = {
     cautious: {
       name: 'cautious',
@@ -253,7 +280,7 @@ async function createDefaultPipelines(codeswarmDir) {
 
   for (const [name, pipeline] of Object.entries(pipelines)) {
     await fs.writeJSON(
-      path.join(codeswarmDir, 'pipelines', `${name}.json`),
+      path.join(mehaisiDir, 'pipelines', `${name}.json`),
       pipeline,
       { spaces: 2 }
     );

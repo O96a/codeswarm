@@ -3,7 +3,7 @@ const path = require('path');
 const chalk = require('chalk');
 
 async function showReport(session, options) {
-  const sessionsDir = path.join(process.cwd(), '.codeswarm', 'sessions');
+  const sessionsDir = path.join(process.cwd(), '.mehaisi', 'sessions');
   
   if (options.last) {
     const sessions = await fs.readdir(sessionsDir);

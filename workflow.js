@@ -3,7 +3,7 @@ const path = require('path');
 const Orchestrator = require('./orchestrator');
 
 async function runWorkflow(workflowName, options) {
-  const configPath = path.join(process.cwd(), '.codeswarm', 'config.json');
+  const configPath = path.join(process.cwd(), '.mehaisi', 'config.json');
   const config = await fs.readJSON(configPath);
 
   const orchestrator = new Orchestrator(config);

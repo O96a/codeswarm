@@ -9,82 +9,177 @@ const AgentRunner = require('./agent-runner');
 const ReportGenerator = require('./report-generator');
 const SafetyManager = require('./safety-manager');
 const CoordinationHub = require('./coordination-hub');
+const MetricsCollector = require('./metrics-collector');
+const SchemaValidator = require('./schema-validator');
+const { LLMProviderManager } = require('./llm-provider');
+const OllamaCloudProvider = require('./providers/ollama-cloud');
+const OllamaLocalProvider = require('./providers/ollama-local');
+const ClaudeCodeProvider = require('./providers/claude-code');
+const { ParallelExecutor } = require('./parallel-executor');
 
 class Orchestrator {
   constructor(config) {
     this.config = config;
     this.sessionId = uuidv4();
-    this.sessionDir = path.join(process.cwd(), '.codeswarm', 'sessions', this.sessionId);
+    this.sessionDir = path.join(process.cwd(), '.mehaisi', 'sessions', this.sessionId);
     this.gitManager = new GitManager();
-    this.agentRunner = new AgentRunner(config);
+
+    // Initialize LLM Provider Manager
+    this.providerManager = new LLMProviderManager(config);
+    this.initializeProviders();
+
+    this.agentRunner = new AgentRunner(config, this.providerManager);
     this.reportGenerator = new ReportGenerator(this.sessionDir);
     this.safetyManager = new SafetyManager(config);
-    this.coordinationHub = new CoordinationHub(this.sessionDir);
+    this.coordinationHub = new CoordinationHub(this.sessionDir, config);
+    this.metrics = new MetricsCollector(this.sessionDir);
+    this.validator = new SchemaValidator();
     this.executionLog = [];
     this.rollbackPoints = [];
+    this.maxRetries = config.max_retries || 3;
+
+    // Initialize parallel executor
+    this.parallelExecutor = new ParallelExecutor(
+      this.agentRunner,
+      config.execution || {}
+    );
+  }
+
+  /**
+   * Initialize and register LLM providers
+   */
+  initializeProviders() {
+    // Register available providers from config
+    const providers = this.config.llm?.providers || {};
+
+    // Register Ollama Cloud provider
+    if (providers['ollama-cloud']) {
+      this.providerManager.register(
+        'ollama-cloud',
+        new OllamaCloudProvider(providers['ollama-cloud'])
+      );
+    }
+
+    // Register Ollama Local provider
+    if (providers['ollama-local']) {
+      this.providerManager.register(
+        'ollama-local',
+        new OllamaLocalProvider(providers['ollama-local'])
+      );
+    }
+
+    // Register Claude Code provider
+    if (providers['claude-code']) {
+      this.providerManager.register(
+        'claude-code',
+        new ClaudeCodeProvider(providers['claude-code'])
+      );
+    }
   }
 
   async initialize() {
-    console.log(chalk.blue.bold('\n🚀 Initializing CodeSwarm Session\n'));
-    
-    // Create session directory
-    await fs.ensureDir(this.sessionDir);
-    await fs.ensureDir(path.join(this.sessionDir, 'reports'));
-    await fs.ensureDir(path.join(this.sessionDir, 'diffs'));
-    await fs.ensureDir(path.join(this.sessionDir, 'checkpoints'));
-    await fs.ensureDir(path.join(this.sessionDir, 'coordination'));
+    console.log(chalk.blue.bold('\n🚀 Initializing Mehaisi Session\n'));
 
-    // Pre-flight checks
-    const spinner = ora('Running pre-flight checks...').start();
-    
     try {
-      await this.safetyManager.runPreflightChecks();
-      spinner.succeed('Pre-flight checks passed');
+      // Create session directory
+      await fs.ensureDir(this.sessionDir);
+      await fs.ensureDir(path.join(this.sessionDir, 'reports'));
+      await fs.ensureDir(path.join(this.sessionDir, 'diffs'));
+      await fs.ensureDir(path.join(this.sessionDir, 'checkpoints'));
+      await fs.ensureDir(path.join(this.sessionDir, 'coordination'));
+
+      // Pre-flight checks
+      const spinner = ora('Running pre-flight checks...').start();
+
+      try {
+        await this.safetyManager.runPreflightChecks();
+        spinner.succeed('Pre-flight checks passed');
+      } catch (error) {
+        spinner.fail('Pre-flight checks failed');
+        throw new Error(`Pre-flight check failed: ${error.message}`);
+      }
+
+      // Initialize metrics
+      this.metrics.startSession();
+
+      // Create snapshot with error handling
+      let snapshot;
+      try {
+        snapshot = await this.gitManager.createSnapshot(this.sessionId);
+      } catch (error) {
+        throw new Error(`Failed to create git snapshot: ${error.message}. Ensure you're in a git repository.`);
+      }
+
+      this.executionLog.push({
+        timestamp: new Date(),
+        type: 'snapshot',
+        data: snapshot
+      });
+
+      console.log(chalk.green(`\n✓ Session initialized: ${this.sessionId}\n`));
     } catch (error) {
-      spinner.fail('Pre-flight checks failed');
+      console.error(chalk.red(`\n✗ Initialization failed: ${error.message}\n`));
       throw error;
     }
-
-    // Create snapshot
-    const snapshot = await this.gitManager.createSnapshot(this.sessionId);
-    this.executionLog.push({
-      timestamp: new Date(),
-      type: 'snapshot',
-      data: snapshot
-    });
-
-    console.log(chalk.green(`\n✓ Session initialized: ${this.sessionId}\n`));
   }
 
   async runAgent(agentName, options = {}) {
     console.log(chalk.blue.bold(`\n🤖 Running Agent: ${agentName}\n`));
 
     const agentId = uuidv4();
-    const startTime = Date.now();
+    const agentContext = this.metrics.startAgent(agentName);
+    let rollbackPoint;
 
     try {
       // Create rollback point
-      const rollbackPoint = await this.createRollbackPoint(agentName);
+      rollbackPoint = await this.createRollbackPoint(agentName);
 
-      // Load agent configuration
+      // Load agent configuration with validation
       const agentConfig = await this.loadAgentConfig(agentName);
+      const validation = this.validator.validateAgentConfig(agentConfig);
+      if (!validation.valid) {
+        throw new Error(`Invalid agent config for ${agentName}: ${validation.errors.join(', ')}`);
+      }
 
       // Check if coordination is needed
       if (agentConfig.coordination && agentConfig.coordination.enabled) {
         await this.coordinationHub.registerAgent(agentId, agentConfig);
       }
 
-      // Run the agent
-      const result = await this.agentRunner.execute(agentName, agentConfig, {
-        ...options,
-        agentId,
-        sessionId: this.sessionId,
-        coordinationHub: this.coordinationHub
-      });
+      // Run the agent with retry logic for transient failures
+      let result;
+      let lastError;
+      for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+        try {
+          result = await this.agentRunner.execute(agentName, agentConfig, {
+            ...options,
+            agentId,
+            sessionId: this.sessionId,
+            coordinationHub: this.coordinationHub
+          });
+          break; // Success, exit retry loop
+        } catch (err) {
+          lastError = err;
+          if (attempt < this.maxRetries && this.isTransientError(err)) {
+            console.log(chalk.yellow(`  ⚠ Attempt ${attempt} failed, retrying... (${err.message})\n`));
+            await this.sleep(1000 * attempt); // Exponential backoff
+          } else {
+            throw err; // Not retryable or max retries reached
+          }
+        }
+      }
 
       // Validate results
       if (this.config.safety.require_tests && !options.skipTests) {
-        await this.safetyManager.runTests();
+        try {
+          const testSuccess = await this.safetyManager.runTests();
+          this.metrics.recordTestExecution(testSuccess);
+        } catch (testError) {
+          this.metrics.recordTestExecution(false);
+          throw testError;
+        }
+      } else if (options.skipTests) {
+        this.metrics.recordTestSkipped('Skipped via options');
       }
 
       // Record execution
@@ -93,10 +188,13 @@ class Orchestrator {
         type: 'agent_execution',
         agentId,
         agentName,
-        duration: Date.now() - startTime,
+        duration: Date.now() - agentContext.startTime,
         result,
         rollbackPoint
       });
+
+      // Record metrics
+      this.metrics.completeAgent(agentContext, true, result);
 
       // Generate agent report
       await this.reportGenerator.generateAgentReport(agentName, result);
@@ -107,10 +205,19 @@ class Orchestrator {
 
     } catch (error) {
       console.error(chalk.red(`\n✗ Agent ${agentName} failed: ${error.message}\n`));
-      
+
+      // Record failed metrics
+      this.metrics.completeAgent(agentContext, false);
+
       // Auto-rollback on failure
-      if (this.config.safety.rollback_on_failure) {
-        await this.rollbackToLastCheckpoint();
+      if (this.config.safety.rollback_on_failure && rollbackPoint) {
+        try {
+          console.log(chalk.yellow('  ↺ Rolling back changes...'));
+          await this.rollbackToLastCheckpoint();
+          console.log(chalk.green('  ✓ Rollback completed'));
+        } catch (rollbackError) {
+          console.error(chalk.red(`  ✗ Rollback failed: ${rollbackError.message}`));
+        }
       }
 
       throw error;
@@ -132,7 +239,28 @@ class Orchestrator {
       console.log(chalk.cyan(`\n→ Workflow Step: ${step.name}\n`));
 
       if (step.type === 'agent') {
-        const result = await this.runAgent(step.agent, {
+        // Determine which agent to run
+        let agentToRun = step.agent;
+
+        // Optionally use intelligent routing to select best agent
+        if (step.auto_select_agent && step.task_description) {
+          const routing = await this.coordinationHub.recommendAgentForTask({
+            name: step.name,
+            description: step.task_description,
+            requiredCapability: step.required_capability,
+            type: step.agent_type
+          });
+
+          if (routing.agent) {
+            console.log(chalk.blue(`  🧠 Intelligent routing selected: ${routing.agent.name} (confidence: ${(routing.confidence * 100).toFixed(0)}%)`));
+            console.log(chalk.gray(`     Reason: ${routing.reason}\n`));
+            agentToRun = routing.agent.name;
+          } else {
+            console.log(chalk.yellow(`  ⚠ Auto-select failed, using default: ${step.agent}\n`));
+          }
+        }
+
+        const result = await this.runAgent(agentToRun, {
           ...options,
           ...step.options
         });
@@ -142,6 +270,24 @@ class Orchestrator {
         if (step.stop_on_failure && result.failed) {
           console.log(chalk.yellow('\n⚠ Stopping workflow due to failure\n'));
           break;
+        }
+      } else if (step.type === 'parallel') {
+        // Handle parallel execution of multiple agents
+        const parallelResults = await this.executeParallelAgents(step.agents, {
+          ...options,
+          ...step.options,
+          coordinationHub: this.coordinationHub
+        });
+
+        results.push({ step: step.name, results: parallelResults });
+
+        // Check if we should stop on failure
+        if (step.stop_on_failure) {
+          const hasFailures = parallelResults.some(r => r.status === 'rejected' || !r.value?.success);
+          if (hasFailures) {
+            console.log(chalk.yellow('\n⚠ Stopping workflow due to parallel execution failure\n'));
+            break;
+          }
         }
       } else if (step.type === 'coordination') {
         await this.coordinationHub.coordinateStep(step, results);
@@ -158,11 +304,38 @@ class Orchestrator {
     return results;
   }
 
+  /**
+   * Execute multiple agents in parallel
+   * @param {Array<string>} agents - List of agent names
+   * @param {Object} options - Common options for all agents
+   * @returns {Promise<Array>} Results from all agents
+   */
+  async executeParallelAgents(agents, options = {}) {
+    console.log(chalk.blue(`\n🚀 Executing ${agents.length} agents in parallel\n`));
+
+    // Map agent names to tasks for parallel executor
+    const tasks = agents.map(agentName => ({
+      agentName,
+      options: {
+        coordinationHub: this.coordinationHub,
+        ...options,
+        // We'll let parallel-executor generate/manage unique agent IDs
+      }
+    }));
+
+    try {
+      return await this.parallelExecutor.executeParallel(tasks);
+    } catch (error) {
+      console.error(chalk.red(`\n✗ Parallel execution failed: ${error.message}\n`));
+      throw error;
+    }
+  }
+
   async runPipeline(strategy, options = {}) {
     console.log(chalk.blue.bold(`\n🏗️  Running Pipeline: ${strategy}\n`));
 
     const pipeline = await this.loadPipeline(strategy);
-    
+
     // Set up coordination for entire pipeline
     if (pipeline.full_coordination) {
       await this.coordinationHub.initializePipeline(pipeline);
@@ -224,9 +397,9 @@ class Orchestrator {
 
   async createCheckpoint(name) {
     const spinner = ora(`Creating checkpoint: ${name}...`).start();
-    
+
     try {
-      await this.gitManager.createTag(`codeswarm-checkpoint-${name}-${Date.now()}`);
+      await this.gitManager.createTag(`mehaisi-checkpoint-${name}-${Date.now()}`);
       await this.createRollbackPoint(name);
       spinner.succeed(`Checkpoint created: ${name}`);
     } catch (error) {
@@ -249,7 +422,7 @@ class Orchestrator {
 
   async pauseForApproval(stepName) {
     const inquirer = require('inquirer');
-    
+
     const { proceed } = await inquirer.prompt([
       {
         type: 'confirm',
@@ -265,8 +438,8 @@ class Orchestrator {
   }
 
   async loadAgentConfig(agentName) {
-    const agentPath = path.join(process.cwd(), '.codeswarm', 'agents', `${agentName}.yml`);
-    
+    const agentPath = path.join(process.cwd(), '.mehaisi', 'agents', `${agentName}.yml`);
+
     if (!await fs.pathExists(agentPath)) {
       throw new Error(`Agent not found: ${agentName}`);
     }
@@ -277,8 +450,8 @@ class Orchestrator {
   }
 
   async loadWorkflow(workflowName) {
-    const workflowPath = path.join(process.cwd(), '.codeswarm', 'workflows', `${workflowName}.json`);
-    
+    const workflowPath = path.join(process.cwd(), '.mehaisi', 'workflows', `${workflowName}.json`);
+
     if (!await fs.pathExists(workflowPath)) {
       throw new Error(`Workflow not found: ${workflowName}`);
     }
@@ -287,8 +460,8 @@ class Orchestrator {
   }
 
   async loadPipeline(strategy) {
-    const pipelinePath = path.join(process.cwd(), '.codeswarm', 'pipelines', `${strategy}.json`);
-    
+    const pipelinePath = path.join(process.cwd(), '.mehaisi', 'pipelines', `${strategy}.json`);
+
     if (!await fs.pathExists(pipelinePath)) {
       throw new Error(`Pipeline not found: ${strategy}`);
     }
@@ -321,15 +494,51 @@ class Orchestrator {
   }
 
   async calculateStats() {
-    // Calculate various statistics
+    // Use metrics collector instead of TODOs
+    const summary = this.metrics.getSummary();
+    const modifiedFiles = await this.gitManager.getModifiedFiles();
+
     return {
-      totalAgents: this.executionLog.filter(e => e.type === 'agent_execution').length,
-      totalDuration: this.executionLog.reduce((acc, e) => acc + (e.duration || 0), 0),
-      filesModified: await this.gitManager.getModifiedFiles().then(f => f.length),
-      testsRun: 0, // TODO: Implement
-      issuesFound: 0, // TODO: Implement
-      issuesResolved: 0 // TODO: Implement
+      totalAgents: summary.totalAgents,
+      successfulAgents: summary.successfulAgents,
+      failedAgents: summary.failedAgents,
+      totalDuration: summary.totalDuration,
+      filesModified: modifiedFiles.all.length,
+      filesCreated: modifiedFiles.created.length,
+      filesDeleted: modifiedFiles.deleted.length,
+      testsRun: summary.testsRun,
+      testsPassed: summary.testsPassed,
+      testsFailed: summary.testsFailed,
+      issuesFound: summary.issuesFound,
+      issuesResolved: summary.issuesResolved,
+      issuesOpen: summary.issuesOpen,
+      coordinationActivity: summary.coordinationActivity
     };
+  }
+
+  /**
+   * Check if an error is transient and worth retrying
+   */
+  isTransientError(error) {
+    const transientMessages = [
+      'ECONNRESET',
+      'ETIMEDOUT',
+      'ENOTFOUND',
+      'network',
+      'timeout',
+      'temporary',
+      'lock'
+    ];
+
+    const message = error.message.toLowerCase();
+    return transientMessages.some(msg => message.includes(msg));
+  }
+
+  /**
+   * Sleep utility for retry delays
+   */
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
 

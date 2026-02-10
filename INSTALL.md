@@ -58,23 +58,23 @@ echo 'export ANTHROPIC_BASE_URL=http://localhost:11434' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## Install CodeSwarm
+## Install Mehaisi
 
 ### Global Installation (Recommended)
 ```bash
-npm install -g codeswarm
+npm install -g mehaisi
 ```
 
 ### Local Installation (Per Project)
 ```bash
-npm install --save-dev codeswarm
-# Run via npx codeswarm
+npm install --save-dev mehaisi
+# Run via npx mehaisi
 ```
 
 ### From Source
 ```bash
-git clone https://github.com/yourusername/codeswarm.git
-cd codeswarm
+git clone https://github.com/yourusername/mehaisi.git
+cd mehaisi
 npm install
 npm link
 ```
@@ -82,8 +82,8 @@ npm link
 ## Verify Installation
 
 ```bash
-# Check CodeSwarm
-codeswarm --version
+# Check Mehaisi
+mehaisi --version
 
 # Check prerequisites
 git --version
@@ -95,7 +95,7 @@ claude --version
 
 ```bash
 cd your-project
-codeswarm init
+mehaisi init
 
 # You should see:
 # ✓ 19 agents configured
@@ -107,24 +107,24 @@ codeswarm init
 
 ```bash
 # List agents
-codeswarm agents --list
+mehaisi agents --list
 
 # Run a safe investigator agent
-codeswarm run api-detective
+mehaisi run api-detective
 
 # Check status
-codeswarm status
+mehaisi status
 ```
 
 ## Troubleshooting
 
-### "command not found: codeswarm"
+### "command not found: mehaisi"
 - Ensure npm global bin is in PATH: `npm config get prefix`
 - Add to PATH: `export PATH=$PATH:$(npm config get prefix)/bin`
 
 ### "Ollama connection failed"
 - Check Ollama is running: `ollama list`
-- Verify URL in config: `.codeswarm/config.json`
+- Verify URL in config: `.mehaisi/config.json`
 - Try: `ollama serve` then retry
 
 ### "Claude Code not found"
@@ -133,18 +133,18 @@ codeswarm status
 - Verify environment variables are set
 
 ### "Permission denied"
-- Use sudo for global install: `sudo npm install -g codeswarm`
+- Use sudo for global install: `sudo npm install -g mehaisi`
 - Or configure npm prefix: `npm config set prefix ~/.npm-global`
 
 ## Next Steps
 
 1. Read the README.md for usage examples
-2. Run `codeswarm workflow investigate` on your project
-3. Review the generated reports in `.codeswarm/sessions/`
-4. Customize agents in `.codeswarm/agents/`
+2. Run `mehaisi workflow investigate` on your project
+3. Review the generated reports in `.mehaisi/sessions/`
+4. Customize agents in `.mehaisi/agents/`
 
 ## Getting Help
 
-- GitHub Issues: https://github.com/yourusername/codeswarm/issues
+- GitHub Issues: https://github.com/yourusername/mehaisi/issues
 - Documentation: README.md
 - Agent Customization: See templates/agents/

@@ -20,9 +20,9 @@ class ReportGenerator {
     const html = `
 <!DOCTYPE html>
 <html>
-<head><title>CodeSwarm Report</title></head>
+<head><title>Mehaisi Report</title></head>
 <body>
-  <h1>CodeSwarm Session Report</h1>
+  <h1>Mehaisi Session Report</h1>
   <pre>${JSON.stringify(report, null, 2)}</pre>
 </body>
 </html>`;

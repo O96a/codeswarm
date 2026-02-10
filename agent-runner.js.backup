@@ -135,34 +135,74 @@ class AgentRunner {
   }
 
   /**
-   * Execute agent with timeout protection using provider layer
+   * Execute agent with timeout protection
    */
   async executeWithTimeout(agentConfig, instructionsPath, agentId, timeout) {
-    // Read instructions
-    const instructions = await fs.readFile(instructionsPath, 'utf8');
+    return new Promise((resolve, reject) => {
+      const command = 'claude';
+      const args = [];
 
-    // Determine provider to use (from agent config or default)
-    const providerName = agentConfig.provider || this.config.llm?.default_provider || 'claude-code';
+      if (!process.env.CLAUDE_CODE_OLLAMA_MODEL) {
+        args.push('--model', agentConfig.model || this.config.model);
+      }
 
-    try {
-      // Execute using provider manager
-      const result = await this.providerManager.execute(instructions, {
-        provider: providerName,
-        model: agentConfig.model || this.config.model,
-        timeout,
-        agentId,
-        workingDir: process.cwd()
+      const childProcess = spawn(command, args, {
+        stdio: ['pipe', 'pipe', 'pipe']
       });
 
-      // Extract output from provider result (flexible to different provider formats)
-      if (typeof result === 'string') return result;
-      return result.output || result.content || result.text || result;
-    } catch (error) {
-      // Re-throw with more context
-      throw new Error(`Provider ${providerName} failed: ${error.message}`);
-    }
-  }
+      this.runningProcesses.set(agentId, childProcess);
 
+      let stdout = '';
+      let stderr = '';
+      let timedOut = false;
+
+      // Set timeout
+      const timeoutId = setTimeout(() => {
+        timedOut = true;
+        childProcess.kill('SIGTERM');
+        reject(new Error(`Agent execution timed out after ${timeout}ms`));
+      }, timeout);
+
+      // Capture output
+      childProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      childProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      // Handle process completion
+      childProcess.on('close', (code) => {
+        clearTimeout(timeoutId);
+
+        if (timedOut) return;
+
+        if (code !== 0) {
+          reject(new Error(`Agent exited with code ${code}. stderr: ${stderr}`));
+        } else {
+          resolve(stdout);
+        }
+      });
+
+      childProcess.on('error', (error) => {
+        clearTimeout(timeoutId);
+        if (!timedOut) {
+          reject(new Error(`Failed to start agent: ${error.message}`));
+        }
+      });
+
+      // Pipe instructions to stdin
+      fs.readFile(instructionsPath, 'utf8').then(instructions => {
+        childProcess.stdin.write(instructions);
+        childProcess.stdin.end();
+      }).catch(err => {
+        clearTimeout(timeoutId);
+        childProcess.kill();
+        reject(new Error(`Failed to read instructions: ${err.message}`));
+      });
+    });
+  }
 
   async buildCoordinationContext(hub, agentId, agentConfig) {
     let context = '\n\n## COORDINATION CONTEXT\n\n';

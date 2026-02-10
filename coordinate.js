@@ -6,7 +6,7 @@ const path = require('path');
 async function coordinateAgents(options) {
   console.log(chalk.blue.bold('\n🤝 Agent Coordination Mode\n'));
   
-  const configPath = path.join(process.cwd(), '.codeswarm', 'config.json');
+  const configPath = path.join(process.cwd(), '.mehaisi', 'config.json');
   const config = await fs.readJSON(configPath);
 
   const orchestrator = new Orchestrator(config);

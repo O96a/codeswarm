@@ -1,4 +1,4 @@
-# CodeSwarm - Complete NPM Package
+# Mehaisi - Complete NPM Package
 ## Multi-Agent AI Code Quality System with Full Coordination
 
 ---
@@ -20,7 +20,7 @@ A **production-ready NPM package** with:
 
 ### Core Files
 - `package.json` - NPM package configuration with all dependencies
-- `bin/codeswarm.js` - CLI entry point (executable)
+- `bin/mehaisi.js` - CLI entry point (executable)
 - `lib/` - Core orchestration engine
   - `orchestrator.js` - Main orchestration logic
   - `coordination-hub.js` - Agent coordination system (400+ lines)
@@ -30,7 +30,7 @@ A **production-ready NPM package** with:
   - `report-generator.js` - Report generation
   
 ### Commands (lib/commands/)
-- `init.js` - Initialize CodeSwarm in any repo
+- `init.js` - Initialize Mehaisi in any repo
 - `agents.js` - List and manage agents
 - `run.js` - Run single agent
 - `workflow.js` - Run agent workflows
@@ -82,7 +82,7 @@ A **production-ready NPM package** with:
 ### Option 1: Publish to NPM (Public)
 
 ```bash
-cd codeswarm-package
+cd mehaisi-package
 
 # 1. Update package.json with your info
 #    - Change "name" if needed
@@ -96,13 +96,13 @@ npm adduser
 npm publish
 
 # Users can then install:
-npm install -g codeswarm
+npm install -g mehaisi
 ```
 
 ### Option 2: Publish to NPM (Private/Scoped)
 
 ```bash
-# 1. Update package.json name to @yourorg/codeswarm
+# 1. Update package.json name to @yourorg/mehaisi
 
 # 2. Publish
 npm publish --access restricted  # Or --access public
@@ -111,7 +111,7 @@ npm publish --access restricted  # Or --access public
 ### Option 3: Install Locally (No NPM)
 
 ```bash
-cd codeswarm-package
+cd mehaisi-package
 
 # 1. Install dependencies
 npm install
@@ -119,19 +119,19 @@ npm install
 # 2. Link globally
 npm link
 
-# Now 'codeswarm' command is available globally
+# Now 'mehaisi' command is available globally
 ```
 
 ### Option 4: Use Directly in Projects
 
 ```bash
 # Copy to your project
-cp -r codeswarm-package /path/to/your/project/node_modules/codeswarm
+cp -r mehaisi-package /path/to/your/project/node_modules/mehaisi
 
 # Or use as local dependency
 cd your-project
-npm install /path/to/codeswarm-package
-npx codeswarm init
+npm install /path/to/mehaisi-package
+npx mehaisi init
 ```
 
 ---
@@ -152,14 +152,14 @@ curl -fsSL https://claude.ai/install.sh | bash
 # Configure for Ollama
 ollama launch claude
 
-# 2. Install CodeSwarm (choose method above)
-npm install -g codeswarm
+# 2. Install Mehaisi (choose method above)
+npm install -g mehaisi
 
 # 3. Go to your messy repo
 cd /path/to/your/messy/codebase
 
 # 4. Initialize
-codeswarm init
+mehaisi init
 
 # You'll see:
 # ✓ Directory structure created
@@ -172,10 +172,10 @@ codeswarm init
 
 ```bash
 # List available agents
-codeswarm agents --list
+mehaisi agents --list
 
 # Run investigation workflow (all investigator agents)
-codeswarm workflow investigate
+mehaisi workflow investigate
 
 # This will run:
 # 1. API Detective - finds API issues
@@ -196,19 +196,19 @@ codeswarm workflow investigate
 
 ```bash
 # View last session report
-codeswarm report --last
+mehaisi report --last
 
 # Check coordination summary
 # (automatically shown after workflow completes)
 
 # Reports are in:
-# .codeswarm/sessions/[session-id]/reports/
+# .mehaisi/sessions/[session-id]/reports/
 #   - api-detective.json
 #   - ui-inspector.json
 #   - etc.
 
 # Coordination data in:
-# .codeswarm/sessions/[session-id]/coordination/
+# .mehaisi/sessions/[session-id]/coordination/
 #   - state.json (shared findings, issues, fixes)
 ```
 
@@ -216,7 +216,7 @@ codeswarm report --last
 
 ```bash
 # Fix API issues
-codeswarm workflow fix-apis
+mehaisi workflow fix-apis
 
 # Agent coordination in action:
 # 1. API Connector queries API Detective findings
@@ -226,7 +226,7 @@ codeswarm workflow fix-apis
 # 5. Other agents see the fixes and adapt
 
 # Fix UI issues
-codeswarm workflow fix-ui
+mehaisi workflow fix-ui
 
 # Agents coordinate:
 # 1. Event Binder queries UI Inspector findings
@@ -239,7 +239,7 @@ codeswarm workflow fix-ui
 
 ```bash
 # Cautious mode (recommended first time)
-codeswarm pipeline cautious
+mehaisi pipeline cautious
 
 # This runs 5 phases:
 # Phase 1: Investigation (all investigators coordinate)
@@ -308,7 +308,7 @@ The **Coordination Hub** (`lib/coordination-hub.js`) enables agents to:
 ### Real Coordination Example
 
 ```bash
-$ codeswarm workflow investigate
+$ mehaisi workflow investigate
 
 🤖 Running: API Detective
   📊 Analyzing 45 API calls...
@@ -354,7 +354,7 @@ $ codeswarm workflow investigate
 ### Git-Based Safety
 - Every agent runs in isolated git branch
 - Automatic checkpoints every N agents
-- One-command rollback: `codeswarm rollback`
+- One-command rollback: `mehaisi rollback`
 - Never modifies main branch directly
 
 ### Test Validation
@@ -376,7 +376,7 @@ $ codeswarm workflow investigate
 
 ## ⚙️ Configuration
 
-Edit `.codeswarm/config.json` after init:
+Edit `.mehaisi/config.json` after init:
 
 ```json
 {
@@ -419,7 +419,7 @@ Edit `.codeswarm/config.json` after init:
 
 ```bash
 # Create new agent file
-nano .codeswarm/agents/my-custom-agent.yml
+nano .mehaisi/agents/my-custom-agent.yml
 ```
 
 ```yaml
@@ -471,7 +471,7 @@ validation:
 ### Run Custom Agent
 
 ```bash
-codeswarm run my-custom-agent
+mehaisi run my-custom-agent
 ```
 
 ---
@@ -480,7 +480,7 @@ codeswarm run my-custom-agent
 
 ```
 your-project/
-├── .codeswarm/
+├── .mehaisi/
 │   ├── config.json           # Configuration
 │   ├── agents/               # 19 agent definitions
 │   │   ├── api-detective.yml
@@ -502,14 +502,14 @@ your-project/
 │   │       └── checkpoints/  # Rollback points
 │   └── reports/              # Global reports
 ├── [your project files]
-└── .gitignore               # Updated with .codeswarm/sessions
+└── .gitignore               # Updated with .mehaisi/sessions
 ```
 
 ---
 
 ## 🐛 Troubleshooting
 
-### "Command not found: codeswarm"
+### "Command not found: mehaisi"
 ```bash
 # Check NPM global bin path
 npm config get prefix
@@ -518,8 +518,8 @@ npm config get prefix
 export PATH=$PATH:$(npm config get prefix)/bin
 
 # Or reinstall
-npm uninstall -g codeswarm
-npm install -g codeswarm
+npm uninstall -g mehaisi
+npm install -g mehaisi
 ```
 
 ### "Ollama connection failed"
@@ -531,7 +531,7 @@ ollama serve
 ollama list
 
 # Verify URL in config
-cat .codeswarm/config.json | grep ollama_url
+cat .mehaisi/config.json | grep ollama_url
 ```
 
 ### "Claude Code not responding"
@@ -550,19 +550,19 @@ ollama launch claude --config
 npm test
 
 # Skip tests temporarily
-codeswarm run <agent> --skip-tests
+mehaisi run <agent> --skip-tests
 
 # Or disable in config
-# Set "require_tests": false in .codeswarm/config.json
+# Set "require_tests": false in .mehaisi/config.json
 ```
 
 ### "Agent not coordinating"
 ```bash
 # Check coordination enabled in agent YAML
-cat .codeswarm/agents/agent-name.yml | grep coordination
+cat .mehaisi/agents/agent-name.yml | grep coordination
 
 # Check coordination hub state
-cat .codeswarm/sessions/[last-session]/coordination/state.json
+cat .mehaisi/sessions/[last-session]/coordination/state.json
 ```
 
 ---
@@ -612,7 +612,7 @@ Before using on production code:
 
 1. **Always start with investigation** - Don't fix blindly
 2. **Read the coordination summary** - Understand what agents found
-3. **Review diffs before accepting** - Use `codeswarm diff --last`
+3. **Review diffs before accepting** - Use `mehaisi diff --last`
 4. **Commit frequently** - After each successful agent
 5. **Don't skip tests** - They're your safety net
 6. **Use cautious pipeline first** - Speed up once comfortable
@@ -639,9 +639,9 @@ Before using on production code:
 
 If you encounter issues:
 1. Check INSTALL.md troubleshooting section
-2. Review agent logs in `.codeswarm/sessions/`
+2. Review agent logs in `.mehaisi/sessions/`
 3. Verify prerequisites are installed correctly
-4. Check configuration in `.codeswarm/config.json`
+4. Check configuration in `.mehaisi/config.json`
 
 ---
 

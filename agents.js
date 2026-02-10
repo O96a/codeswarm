@@ -5,10 +5,10 @@ const Table = require('cli-table3');
 const yaml = require('yaml');
 
 async function listAgents(options) {
-  const agentsDir = path.join(process.cwd(), '.codeswarm', 'agents');
+  const agentsDir = path.join(process.cwd(), '.mehaisi', 'agents');
   
   if (!await fs.pathExists(agentsDir)) {
-    console.log(chalk.red('\n✗ CodeSwarm not initialized. Run: codeswarm init\n'));
+    console.log(chalk.red('\n✗ CodeSwarm not initialized. Run: mehaisi init\n'));
     return;
   }
 

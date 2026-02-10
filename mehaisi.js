@@ -12,6 +12,7 @@ const { showReport } = require('./report');
 const { rollback } = require('./rollback');
 const { interactiveMode } = require('./interactive');
 const { showStatus } = require('./status');
+const { recommendAgent } = require('./recommend');
 
 const program = new Command();
 
@@ -46,6 +47,13 @@ program
   .option('-d, --dry-run', 'Show what would be done without making changes')
   .option('-m, --model <model>', 'Override default model for this run')
   .action(runAgent);
+
+// Recommend command
+program
+  .command('recommend <task>')
+  .description('Get intelligent agent recommendation for a task')
+  .option('-c, --capability <type>', 'Required capability for the task')
+  .action(recommendAgent);
 
 // Workflow command
 program

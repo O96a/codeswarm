@@ -1,0 +1,1 @@
+{"name":"parallel-test","steps":[{"name":"analysis","type":"parallel","agents":["agent1","agent2"]}]}
