@@ -4,6 +4,7 @@ const ora = require('ora');
 const fs = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
+const ui = require('./ui-formatter');
 const GitManager = require('./git-manager');
 const AgentRunner = require('./agent-runner');
 const ReportGenerator = require('./report-generator');
@@ -11,6 +12,7 @@ const SafetyManager = require('./safety-manager');
 const CoordinationHub = require('./coordination-hub');
 const MetricsCollector = require('./metrics-collector');
 const SchemaValidator = require('./schema-validator');
+const CredentialManager = require('./credential-manager');
 const { LLMProviderManager } = require('./llm-provider');
 const OllamaCloudProvider = require('./providers/ollama-cloud');
 const OllamaLocalProvider = require('./providers/ollama-local');
@@ -23,6 +25,10 @@ class Orchestrator {
     this.sessionId = uuidv4();
     this.sessionDir = path.join(process.cwd(), '.mehaisi', 'sessions', this.sessionId);
     this.gitManager = new GitManager();
+
+    // Initialize Credential Manager
+    const configPath = path.join(process.cwd(), '.mehaisi', 'config.json');
+    this.credentialManager = new CredentialManager(configPath);
 
     // Initialize LLM Provider Manager
     this.providerManager = new LLMProviderManager(config);
@@ -52,11 +58,11 @@ class Orchestrator {
     // Register available providers from config
     const providers = this.config.llm?.providers || {};
 
-    // Register Ollama Cloud provider
+    // Register Ollama Cloud provider with credential manager
     if (providers['ollama-cloud']) {
       this.providerManager.register(
         'ollama-cloud',
-        new OllamaCloudProvider(providers['ollama-cloud'])
+        new OllamaCloudProvider(providers['ollama-cloud'], this.credentialManager)
       );
     }
 
@@ -78,7 +84,7 @@ class Orchestrator {
   }
 
   async initialize() {
-    console.log(chalk.blue.bold('\n🚀 Initializing Mehaisi Session\n'));
+    ui.header('Initializing Mehaisi Session', 'rocket');
 
     try {
       // Create session directory
@@ -116,15 +122,15 @@ class Orchestrator {
         data: snapshot
       });
 
-      console.log(chalk.green(`\n✓ Session initialized: ${this.sessionId}\n`));
+      console.log(chalk.green(`\n${ui.icons.success} Session ID: ${chalk.cyan(this.sessionId)}\n`));
     } catch (error) {
-      console.error(chalk.red(`\n✗ Initialization failed: ${error.message}\n`));
+      console.error(chalk.red(`${ui.icons.error} Initialization failed: ${error.message}\n`));
       throw error;
     }
   }
 
   async runAgent(agentName, options = {}) {
-    console.log(chalk.blue.bold(`\n🤖 Running Agent: ${agentName}\n`));
+    ui.agentStart(agentName);
 
     const agentId = uuidv4();
     const agentContext = this.metrics.startAgent(agentName);
@@ -199,12 +205,14 @@ class Orchestrator {
       // Generate agent report
       await this.reportGenerator.generateAgentReport(agentName, result);
 
-      console.log(chalk.green(`\n✓ Agent ${agentName} completed successfully\n`));
+      ui.success(`Agent ${agentName} completed`, true);
+      console.log('');
 
       return result;
 
     } catch (error) {
-      console.error(chalk.red(`\n✗ Agent ${agentName} failed: ${error.message}\n`));
+      ui.error(`Agent ${agentName} failed: ${error.message}`, true);
+      console.log('');
 
       // Record failed metrics
       this.metrics.completeAgent(agentContext, false);
@@ -225,7 +233,8 @@ class Orchestrator {
   }
 
   async runWorkflow(workflowName, options = {}) {
-    console.log(chalk.blue.bold(`\n🔄 Running Workflow: ${workflowName}\n`));
+    ui.section(`Workflow: ${chalk.bold(workflowName)}`);
+    ui.divider();
 
     const workflow = await this.loadWorkflow(workflowName);
     const results = [];
@@ -236,7 +245,7 @@ class Orchestrator {
     }
 
     for (const step of workflow.steps) {
-      console.log(chalk.cyan(`\n→ Workflow Step: ${step.name}\n`));
+      ui.item(`${step.name}`, 0);
 
       if (step.type === 'agent') {
         // Determine which agent to run
@@ -332,7 +341,7 @@ class Orchestrator {
   }
 
   async runPipeline(strategy, options = {}) {
-    console.log(chalk.blue.bold(`\n🏗️  Running Pipeline: ${strategy}\n`));
+    ui.header(`Pipeline: ${strategy.toUpperCase()}`, 'rocket');
 
     const pipeline = await this.loadPipeline(strategy);
 
@@ -344,7 +353,7 @@ class Orchestrator {
     const phases = [];
 
     for (const phase of pipeline.phases) {
-      console.log(chalk.magenta.bold(`\n═══ Phase: ${phase.name} ═══\n`));
+      ui.phase(phase.name);
 
       const phaseResults = [];
 

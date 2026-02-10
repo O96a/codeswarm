@@ -3,12 +3,15 @@ const fs = require('fs-extra');
 const path = require('path');
 const chalk = require('chalk');
 const yaml = require('yaml');
+const ui = require('./ui-formatter');
 const SchemaValidator = require('./schema-validator');
+const ModelResolver = require('./model-resolver');
 
 class AgentRunner {
   constructor(config, providerManager = null) {
     this.config = config;
     this.validator = new SchemaValidator();
+    this.modelResolver = new ModelResolver(config);
     this.runningProcesses = new Map();
 
     // Use provided provider manager or create standalone one
@@ -46,7 +49,7 @@ class AgentRunner {
   }
 
   async execute(agentName, agentConfig, options) {
-    console.log(chalk.cyan(`\n▶ Executing: ${agentConfig.name}\n`));
+    ui.progress(`Executing ${agentConfig.name}...`);
 
     // Report progress start
     if (agentConfig.coordination?.enabled && options.coordinationHub) {
@@ -89,13 +92,13 @@ class AgentRunner {
     // Run Claude Code with timeout and error handling
     try {
       const timeout = this.config.agent_timeout || 600000; // 10 minutes default
-      const output = await this.executeWithTimeout(agentConfig, instructionsPath, options.agentId, timeout);
+      const output = await this.executeWithTimeout(agentConfig, instructionsPath, options.agentId, timeout, options);
 
       if (!output || output.trim() === '') {
         throw new Error('Agent produced no output');
       }
 
-      console.log(chalk.green('\n✓ Agent completed\n'));
+      console.log(chalk.green(`${ui.icons.check} Agent completed\n`));
 
       // Parse output and extract findings
       const result = this.parseAgentOutput(output, agentConfig);
@@ -109,7 +112,7 @@ class AgentRunner {
 
 
     } catch (error) {
-      console.error(chalk.red(`\n✗ Agent failed: ${error.message}\n`));
+      ui.error(`Agent failed: ${error.message}`, true);
 
       // Capture full error context
       const errorDetails = {
@@ -137,18 +140,23 @@ class AgentRunner {
   /**
    * Execute agent with timeout protection using provider layer
    */
-  async executeWithTimeout(agentConfig, instructionsPath, agentId, timeout) {
+  async executeWithTimeout(agentConfig, instructionsPath, agentId, timeout, runtimeOptions = {}) {
     // Read instructions
     const instructions = await fs.readFile(instructionsPath, 'utf8');
 
-    // Determine provider to use (from agent config or default)
-    const providerName = agentConfig.provider || this.config.llm?.default_provider || 'claude-code';
+    // Use ModelResolver for intelligent model and provider selection
+    const executionContext = this.modelResolver.getExecutionContext(agentConfig, runtimeOptions);
+    
+    // Display resolution info in verbose mode
+    if (process.env.MEHAISI_VERBOSE || runtimeOptions.verbose) {
+      this.modelResolver.displayResolutionInfo(agentConfig, runtimeOptions);
+    }
 
     try {
-      // Execute using provider manager
+      // Execute using provider manager with resolved context
       const result = await this.providerManager.execute(instructions, {
-        provider: providerName,
-        model: agentConfig.model || this.config.model,
+        provider: executionContext.provider,
+        model: executionContext.model,
         timeout,
         agentId,
         workingDir: process.cwd()
@@ -156,7 +164,7 @@ class AgentRunner {
 
       // Extract output from provider result (flexible to different provider formats)
       if (typeof result === 'string') return result;
-      return result.output || result.content || result.text || result;
+      return result.output || result.response || result.content || result.text || result;
     } catch (error) {
       // Re-throw with more context
       throw new Error(`Provider ${providerName} failed: ${error.message}`);

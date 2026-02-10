@@ -35,10 +35,11 @@ Transform messy codebases into production-grade applications using AI agents tha
 - **Hard Safety Limits**: 10-minute timeouts, retry logic, circuit breakers
 
 ### 🔌 Multi-Provider Support
-- **Ollama Cloud**: Use cloud-hosted models (Kimi 2.5, etc.)
-- **Ollama Local**: Run models locally
-- **Claude Code**: Execute via Claude Code CLI
+- **Ollama Cloud**: Use cloud-hosted models (Kimi 2.5, etc.) - API key auto-prompted
+- **Ollama Local**: Run models locally - no credentials needed
+- **Claude Code**: Execute via Claude Code CLI - session token auto-prompted
 - **Extensible**: Easy to add new providers
+- **Smart Credentials**: Interactive setup, never manually export keys
 
 ### 🛡️ Safety & Quality
 - **19 Specialized Agents**: From security scanners to performance optimizers
@@ -116,26 +117,91 @@ npm install
 sudo npm link
 ```
 
+## ⚙️ Configuration
+
+### Interactive Credential Setup
+
+Mehaisi features an **intelligent credential manager** that automatically prompts you for API keys when needed. No more manual exports!
+
+```bash
+# Initialize your project
+cd your-project
+mehaisi init --model kimi-k2.5:cloud
+
+# Setup credentials interactively (recommended)
+mehaisi credentials
+
+# That's it! You're prompted once, credentials are saved
+```
+
+**What happens:**
+1. ✓ Detects which providers need credentials
+2. ✓ Prompts you for missing API keys (hidden input)
+3. ✓ Optionally saves to config file
+4. ✓ Never asks again (unless you choose not to save)
+
+**Credential Priority:**
+```
+1. Environment Variable → OLLAMA_CLOUD_API_KEY, CLAUDE_CODE_SESSION_ACCESS_TOKEN
+2. Config File → .mehaisi/config.json (gitignored automatically)
+3. Interactive Prompt → Asks when needed
+```
+
+**Example Session:**
+```
+$ mehaisi credentials
+
+🔐 SETTING UP CREDENTIALS
+────────────────────────────────────────────────────────────
+
+Provider: ollama-cloud
+
+⚠ Ollama Cloud API key not found
+ℹ Get your API key from: https://ollama.com
+
+? Enter your Ollama Cloud API key: ****************************************
+? Save API key to config file (.mehaisi/config.json)? Yes
+✓ API key saved to config
+
+✓ Credential setup complete
+```
+
+**No Manual Exports Needed!** Forget about:
+```bash
+# ❌ Old way - manual every time
+export OLLAMA_CLOUD_API_KEY="your-key"
+export CLAUDE_CODE_SESSION_ACCESS_TOKEN="token"
+mehaisi pipeline cautious
+
+# ✅ New way - automatic
+mehaisi pipeline cautious  # You'll be prompted if needed
+```
+
+See [CREDENTIALS_GUIDE.md](CREDENTIALS_GUIDE.md) for detailed documentation.
+
 ## 🚀 Quick Start
 
 ```bash
-# Initialize in your project
+# 1. Initialize in your project
 cd your-messy-repo
-mehaisi init --model qwen3-coder
+mehaisi init --model kimi-k2.5:cloud
 
-# Get intelligent agent recommendation
+# 2. Setup credentials (interactive - one time)
+mehaisi credentials
+
+# 3. Get intelligent agent recommendation
 mehaisi recommend "Find and fix API security issues"
 # → Recommends: Security Scanner (85% confidence)
 #    Reason: has security-analysis capability, resolved 3 similar issues
 
-# View learning progress (after 5+ sessions)
+# 4. View learning progress (after 5+ sessions)
 mehaisi learning dashboard
 mehaisi learning stats
 
-# Run investigation workflow
+# 5. Run investigation workflow
 mehaisi workflow investigate
 
-# Fix issues (can auto-select best agents)
+# 6. Fix issues (can auto-select best agents)
 mehaisi workflow fix-apis
 mehaisi workflow fix-ui
 

@@ -104,6 +104,18 @@ program
   .description('Show current CodeSwarm status')
   .action(showStatus);
 
+// Credentials command
+program
+  .command('credentials')
+  .description('Setup API keys and credentials for providers')
+  .action(async () => {
+    const CredentialManager = require('./credential-manager');
+    const path = require('path');
+    const configPath = path.join(process.cwd(), '.mehaisi', 'config.json');
+    const credManager = new CredentialManager(configPath);
+    await credManager.setupAllCredentials();
+  });
+
 // Interactive mode
 program
   .command('interactive')

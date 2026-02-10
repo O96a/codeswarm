@@ -3,12 +3,13 @@ const path = require('path');
 const chalk = require('chalk');
 const Table = require('cli-table3');
 const yaml = require('yaml');
+const ui = require('./ui-formatter');
 
 async function listAgents(options) {
   const agentsDir = path.join(process.cwd(), '.mehaisi', 'agents');
   
   if (!await fs.pathExists(agentsDir)) {
-    console.log(chalk.red('\n✗ CodeSwarm not initialized. Run: mehaisi init\n'));
+    ui.error('Mehaisi not initialized. Run: mehaisi init');
     return;
   }
 
@@ -30,29 +31,37 @@ async function listAgents(options) {
     return acc;
   }, {});
 
-  console.log(chalk.blue.bold('\n📋 Available Agents:\n'));
+  ui.header('Available Agents', 'gear');
 
   for (const [type, agentList] of Object.entries(byType)) {
-    console.log(chalk.cyan(`\n${type.toUpperCase()}:`));
+    console.log(chalk.cyan.bold(`\n${type.toUpperCase()}`));
     
     const table = new Table({
-      head: ['Name', 'Risk', 'Capabilities', 'Coordinates With'],
-      style: { head: ['cyan'] }
+      head: ['Agent', 'Risk', 'Capabilities'],
+      style: { head: ['cyan'], border: ['gray'] },
+      chars: {
+        'top': '─', 'top-mid': '┬', 'top-left': '┌', 'top-right': '┐',
+        'bottom': '─', 'bottom-mid': '┴', 'bottom-left': '└', 'bottom-right': '┘',
+        'left': '│', 'left-mid': '├', 'mid': '─', 'mid-mid': '┼',
+        'right': '│', 'right-mid': '┤', 'middle': '│'
+      }
     });
 
     for (const agent of agentList) {
+      const riskColor = agent.risk_level === 'low' ? chalk.green : 
+                       agent.risk_level === 'medium' ? chalk.yellow : chalk.red;
       table.push([
         agent.name,
-        agent.risk_level,
-        agent.coordination?.capabilities?.join(', ') || 'none',
-        agent.coordination?.shares_with?.join(', ') || 'none'
+        riskColor(agent.risk_level),
+        (agent.coordination?.capabilities?.slice(0, 2).join(', ') || 'none')
       ]);
     }
 
     console.log(table.toString());
   }
 
-  console.log(chalk.gray(`\nTotal: ${agents.length} agents\n`));
+  console.log(chalk.gray(`\n────────────────────────────`));
+  console.log(`Total: ${chalk.white(agents.length)} agents configured\n`);
 }
 
 module.exports = { listAgents };

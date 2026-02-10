@@ -1,7 +1,7 @@
 name: Accessibility Auditor
 type: investigator
 risk_level: low
-model: qwen3-coder
+# model: qwen3-coder  # Optional: Override global model for this agent
 coordination:
   enabled: true
   capabilities: [accessibility, a11y-compliance]

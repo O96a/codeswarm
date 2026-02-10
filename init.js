@@ -3,9 +3,10 @@ const path = require('path');
 const chalk = require('chalk');
 const ora = require('ora');
 const inquirer = require('inquirer');
+const ui = require('./ui-formatter');
 
 async function initializeProject(options) {
-  console.log(chalk.blue.bold('\n🎯 Initializing Mehaisi\n'));
+  ui.header('Initializing Mehaisi', 'rocket');
 
   const cwd = process.cwd();
   const mehaisiDir = path.join(cwd, '.mehaisi');
@@ -40,29 +41,56 @@ async function initializeProject(options) {
     }
 
     // Create default config with LLM provider abstraction
+    const selectedModel = options.model || 'kimi-k2.5:cloud';
+    
+    // Determine default provider based on selected model
+    // This uses intelligent pattern matching to select the appropriate provider
+    let defaultProvider;
+    if (selectedModel.includes(':cloud')) {
+      defaultProvider = 'ollama-cloud';
+    } else if (selectedModel.includes(':local') || (!selectedModel.includes('claude') && !selectedModel.includes(':'))) {
+      defaultProvider = 'ollama-local';
+    } else {
+      defaultProvider = 'claude-code';
+    }
+    
+    /**
+     * MODEL SELECTION PRIORITY (enforced by ModelResolver):
+     * 
+     * 1. Runtime override:  mehaisi run agent --model <model>
+     * 2. Global config:     Set during 'mehaisi init --model <model>' (this value)
+     * 3. Agent default:     Defined in agent YAML file (usually commented out)
+     * 4. Provider default:  From provider configuration
+     * 
+     * This ensures your chosen model is used across all agents unless
+     * explicitly overridden at runtime or in specific agent configs.
+     */
     const config = {
-      model: options.model || 'kimi-k2.5:cloud',
+      model: selectedModel,
       ollama_url: 'https://api.ollama.com',  // Ollama Cloud by default
       llm: {
-        default_provider: 'claude-code',
+        default_provider: defaultProvider,
         providers: {
           'ollama-cloud': {
             type: 'ollama',
             url: 'https://api.ollama.com',
-            model: 'kimi-k2.5:cloud',
-            priority: 1
+            model: selectedModel.includes(':cloud') ? selectedModel : 'kimi-k2.5:cloud',
+            priority: 1,
+            // Set OLLAMA_CLOUD_API_KEY environment variable for authentication
           },
           'ollama-local': {
             type: 'ollama',
             url: 'http://localhost:11434',
-            model: 'kimi-k2.5',
+            model: selectedModel.replace(':cloud', '').replace(':local', ''),
             priority: 2,
-            fallback: true
+            fallback: true,
+            // Requires Ollama running locally: ollama serve
           },
           'claude-code': {
             type: 'claude-cli',
-            model: 'kimi-k2.5:cloud',
-            timeout: 600000
+            model: selectedModel,
+            timeout: 600000,
+            // Requires CLAUDE_CODE_SESSION_ACCESS_TOKEN for authentication
           }
         }
       },
@@ -123,19 +151,19 @@ async function initializeProject(options) {
       }
     }
 
-    spinner.succeed('Mehaisi initialized successfully!');
+    spinner.succeed('Initialization complete');
 
-    console.log(chalk.green('\n✓ Directory structure created'));
-    console.log(chalk.green(`✓ ${chalk.bold('19')} agents configured`));
-    console.log(chalk.green('✓ Default workflows created'));
-    console.log(chalk.green('✓ Default pipelines created'));
+    ui.section('Configuration');
+    ui.item(`${chalk.bold('19')} agents configured`, 0);
+    ui.item(`Workflows & pipelines ready`, 0);
+    ui.item(`Model: ${chalk.cyan(selectedModel)}`, 0);
+    ui.item(`Provider: ${chalk.cyan(defaultProvider)}`, 0);
 
-    console.log(chalk.blue('\n📚 Next steps:'));
-    console.log(chalk.white('  1. mehaisi agents --list'));
-    console.log(chalk.white('  2. mehaisi run api-detective'));
-    console.log(chalk.white('  3. mehaisi workflow investigate'));
-    console.log(chalk.white('\nOr run the full pipeline:'));
-    console.log(chalk.white('  mehaisi pipeline cautious\n'));
+    ui.nextSteps('Get Started', [
+      `${chalk.cyan('mehaisi credentials')} ${chalk.gray('· Setup API keys')}`,
+      `${chalk.cyan('mehaisi agents --list')} ${chalk.gray('· View available agents')}`,
+      `${chalk.cyan('mehaisi pipeline cautious')} ${chalk.gray('· Run full pipeline')}`
+    ]);
 
   } catch (error) {
     spinner.fail('Initialization failed');

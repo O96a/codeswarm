@@ -1,7 +1,7 @@
 name: API Connector
 type: fixer
 risk_level: medium
-model: qwen3-coder
+# model: qwen3-coder  # Optional: Override global model for this agent
 
 coordination:
   enabled: true

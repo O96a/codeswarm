@@ -1,7 +1,7 @@
 name: API Detective
 type: investigator
 risk_level: low
-model: qwen3-coder
+# model: qwen3-coder  # Optional: Override global model for this agent
 priority: 1
 
 coordination:
