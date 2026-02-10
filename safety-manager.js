@@ -849,6 +849,11 @@ class SafetyManager {
     this._baselineResult = null;
     // Maximum remediation attempts per test run
     this._maxRemediationAttempts = config.safety?.max_remediation_attempts || 3;
+    // Sanitized environment discovered during baseline remediation.
+    // When set, all subsequent test runs use this env automatically.
+    this._sanitizedTestEnv = null;
+    // Keys that were stripped from the env to make tests pass
+    this._strippedEnvKeys = [];
   }
 
   async runPreflightChecks() {
@@ -877,6 +882,11 @@ class SafetyManager {
    * @returns {{ passed: boolean, diagnosis: object|null, output: string }}
    */
   async captureBaseline() {
+    // Return cached baseline if already captured (avoid re-running per agent)
+    if (this._baselineResult) {
+      return this._baselineResult;
+    }
+
     if (this.config.safety?.require_tests === false) {
       this._baselineResult = { passed: true, diagnosis: null, output: '', skipped: true };
       return this._baselineResult;
@@ -890,16 +900,50 @@ class SafetyManager {
 
     console.log(chalk.blue('  📋 Capturing test baseline...'));
 
-    const result = this._executeTestsCapture(testCommand);
+    // First run: use the current environment
+    let result = this._executeTestsCapture(testCommand);
     if (result.passed) {
       console.log(chalk.green('  ✓ Baseline: all tests pass'));
       this._baselineResult = { passed: true, diagnosis: null, output: result.output };
-    } else {
-      const diagnosis = TestFailureAnalyzer.analyze(result.stdout, result.stderr, result.exitCode);
-      console.log(chalk.yellow(`  ⚠ Baseline: tests already failing — ${diagnosis.summary}`));
-      this._baselineResult = { passed: false, diagnosis, output: result.output, exitCode: result.exitCode };
+      return this._baselineResult;
     }
 
+    // Baseline failed — analyze and attempt remediation NOW
+    const diagnosis = TestFailureAnalyzer.analyze(result.stdout, result.stderr, result.exitCode);
+    console.log(chalk.yellow(`  ⚠ Baseline: tests failing — ${diagnosis.summary}`));
+
+    // ── Attempt to remediate the baseline failure ──────────────────────
+    const remediation = TestRemediator.remediate(diagnosis, testCommand, this.config);
+
+    if (remediation.success && remediation.action === 'rerun_with_clean_env') {
+      console.log(chalk.blue(`  🔧 Baseline remediation: stripping env vars [${remediation.strippedKeys.join(', ')}]`));
+      const retryResult = this._executeTestsCapture(testCommand, { env: remediation.sanitizedEnv });
+
+      if (retryResult.passed) {
+        console.log(chalk.green('  ✓ Baseline: tests pass with sanitized environment'));
+        console.log(chalk.yellow(`  💡 Env vars [${remediation.strippedKeys.join(', ')}] conflict with project settings — auto-stripped for all test runs`));
+        // Persist the working env so all future test runs use it
+        this._sanitizedTestEnv = remediation.sanitizedEnv;
+        this._strippedEnvKeys = remediation.strippedKeys;
+        this._baselineResult = { passed: true, diagnosis: null, output: retryResult.output, remediated: true, strippedKeys: remediation.strippedKeys };
+        return this._baselineResult;
+      }
+      // Remediation didn't fix it — fall through to record as pre-existing failure
+      console.log(chalk.yellow('  ⚠ Baseline: tests still fail after env remediation'));
+    } else if (remediation.success && remediation.action === 'installed_dependency') {
+      console.log(chalk.blue(`  🔧 Baseline remediation: ${remediation.reason}`));
+      const retryResult = this._executeTestsCapture(testCommand);
+      if (retryResult.passed) {
+        console.log(chalk.green('  ✓ Baseline: tests pass after dependency install'));
+        this._baselineResult = { passed: true, diagnosis: null, output: retryResult.output, remediated: true };
+        return this._baselineResult;
+      }
+      console.log(chalk.yellow('  ⚠ Baseline: tests still fail after dependency install'));
+    }
+
+    // Record as pre-existing failure (un-remediable)
+    console.log(chalk.yellow(`  ⚠ Baseline: pre-existing failure recorded — agents will not be blamed`));
+    this._baselineResult = { passed: false, diagnosis, output: result.output, exitCode: result.exitCode };
     return this._baselineResult;
   }
 
@@ -1086,8 +1130,13 @@ class SafetyManager {
     }
 
     // ── Run tests with full output capture ─────────────────────────────────
+    // Use the sanitized environment if baseline remediation discovered one
+    const testOpts = this._sanitizedTestEnv ? { env: this._sanitizedTestEnv } : {};
+    if (this._sanitizedTestEnv) {
+      console.log(chalk.gray(`  ℹ Using sanitized env (stripped: ${this._strippedEnvKeys.join(', ')})`));
+    }
     console.log(`🧪 Running tests: ${testCommand}`);
-    let result = this._executeTestsCapture(testCommand);
+    let result = this._executeTestsCapture(testCommand, testOpts);
 
     if (result.passed) {
       console.log(chalk.green('✓ Tests passed'));
