@@ -51,7 +51,35 @@ Transform messy codebases into production-grade applications using AI agents tha
 
 ### 🎉 Major Features (Feb 2026)
 
-**🧠 SONA Self-Learning System** ⭐ NEW
+**🎨 Modern UX/UI Overhaul** ⭐ NEW
+- Professional, point-based design (no emojis, no gaps)
+- Unicode box-drawing for clean visual hierarchy
+- Semantic color coding (green=success, yellow=warning, red=error, blue=info)
+- Centralized UIFormatter for consistent styling across all commands
+- Modern table formatting with proper alignment and borders
+
+**🔐 Interactive Credential Manager** ⭐ NEW
+- No more manual `export` commands - system prompts when credentials needed
+- Secure password-masked input for API keys
+- Optional save to config for persistent storage
+- Helpful setup tips with provider-specific URLs
+- `mehaisi credentials` command for easy setup
+
+**🎯 Smart Model Selection System** ⭐ NEW
+- 4-tier priority: Runtime flag → Global config → Agent default → Provider default
+- Auto-detect provider from model name (`:cloud` → ollama-cloud)
+- Model compatibility validation before execution
+- ModelResolver ensures correct model/provider pairing
+- Override models per-agent or globally via config
+
+**⚙️ CLI Configuration Management** ⭐ NEW
+- `mehaisi config` command for interactive or flag-based configuration
+- Change safety mode, model, execution settings from CLI
+- List current config: `mehaisi config --list`
+- Quick updates: `mehaisi config --auto-apply true --model kimi-k2.5:cloud`
+- No need to manually edit JSON files
+
+**🧠 SONA Self-Learning System**
 - System learns from every agent execution and improves routing decisions
 - Automatic weight optimization based on real-world outcomes
 - Discovers new agent capabilities from successful completions
@@ -306,7 +334,17 @@ mehaisi recommend "Write comprehensive unit tests"
 ### Basic Operations
 ```bash
 # Initialize
-mehaisi init [--template react|node|python|vue|angular]
+mehaisi init [--template react|node|python|vue|angular] [--model kimi-k2.5:cloud]
+
+# Setup credentials (interactive)
+mehaisi credentials
+
+# Configure settings
+mehaisi config --list                    # View current settings
+mehaisi config --interactive             # Interactive configuration
+mehaisi config --auto-apply false        # Change safety mode
+mehaisi config --model kimi-k2.5:cloud   # Change model
+mehaisi config --provider ollama-cloud   # Change provider
 
 # List agents
 mehaisi agents --list
@@ -339,10 +377,18 @@ mehaisi pipeline balanced      # Balanced speed/safety
 mehaisi pipeline aggressive    # Fast (use with caution)
 ```
 
-### Coordination & Reports
+### System Management
 ```bash
-# Coordination mode
-mehaisi coordinate --goal "Fix all API and UI issues"
+# Check status
+mehaisi status
+
+# Configure settings
+mehaisi config --list             # View all settings
+mehaisi config                    # Interactive mode
+mehaisi config --auto-apply true  # Enable auto-apply (use with caution)
+
+# Manage credentials
+mehaisi credentials               # Setup/update API keys
 
 # View reports
 mehaisi report --last
@@ -351,11 +397,35 @@ mehaisi diff --last
 # Rollback changes
 mehaisi rollback [session-id]
 
-# Check status
-mehaisi status
+# Coordination mode
+mehaisi coordinate --goal "Fix all API and UI issues"
 ```
 
 ## ⚙️ Configuration
+
+### Quick Configuration via CLI
+
+```bash
+# View current configuration
+mehaisi config --list
+
+# Interactive configuration (recommended)
+mehaisi config
+# or
+mehaisi config --interactive
+
+# Quick setting changes
+mehaisi config --auto-apply false          # Disable auto-apply (safest)
+mehaisi config --require-tests true        # Require tests to pass
+mehaisi config --rollback-on-failure true  # Auto-rollback on errors
+mehaisi config --model kimi-k2.5:cloud     # Change model
+mehaisi config --provider ollama-cloud     # Change provider
+
+# Multiple settings at once
+mehaisi config --auto-apply false --require-tests true
+```
+
+### Manual Configuration
 
 Edit `.mehaisi/config.json`:
 
@@ -681,7 +751,53 @@ rm -rf .mehaisi/learning/       # Delete all learning data
 - Review agent logs in `.mehaisi/sessions/[session-id]/`
 - Check for port conflicts if running multiple instances
 
-## 📚 Best Practices
+## � Documentation
+
+Comprehensive guides for all features:
+
+### Core Documentation
+- **[README.md](README.md)** - This file, overview and quick start
+- **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Complete manual testing guide with step-by-step instructions
+
+### Feature Guides
+- **[CREDENTIALS_GUIDE.md](CREDENTIALS_GUIDE.md)** - Interactive credential management
+  - How the credential manager works
+  - Setup and storage options
+  - Security best practices
+  - Troubleshooting authentication issues
+
+- **[MODEL_SELECTION_GUIDE.md](MODEL_SELECTION_GUIDE.md)** - Smart model selection system
+  - Model selection priority rules
+  - Provider auto-detection
+  - Model compatibility validation
+  - How to override models per-agent
+  - Common scenarios and examples
+
+- **[UX_ENHANCEMENTS.md](UX_ENHANCEMENTS.md)** - Modern UI improvements
+  - Design principles and visual hierarchy
+  - Before/after comparisons
+  - UIFormatter API reference
+  - Customization options
+
+### Implementation References
+- **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Production deployment
+- **[HOOKS_GUIDE.md](HOOKS_GUIDE.md)** - Learning system hooks
+- **[ROUTING_COMPLETE.md](ROUTING_COMPLETE.md)** - Intelligent routing system
+- **[SESSION_SUMMARY_LEARNING.md](SESSION_SUMMARY_LEARNING.md)** - SONA self-learning
+
+### Quick Reference
+```bash
+# After installing, access these guides locally:
+cd ~/.mehaisi
+ls *.md  # Or wherever you cloned the repo
+
+# Online (GitHub):
+https://github.com/O96a/codeswarm/blob/main/CREDENTIALS_GUIDE.md
+https://github.com/O96a/codeswarm/blob/main/MODEL_SELECTION_GUIDE.md
+https://github.com/O96a/codeswarm/blob/main/TESTING_GUIDE.md
+```
+
+## �📚 Best Practices
 
 1. **Start with investigation**: Always run `investigate` workflow first to understand issues
 2. **Use intelligent routing**: Try `mehaisi recommend` before manually selecting agents
