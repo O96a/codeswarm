@@ -345,6 +345,11 @@ class Orchestrator {
 
     const pipeline = await this.loadPipeline(strategy);
 
+    // Merge config auto_apply setting into options if not explicitly set
+    if (options.autoApprove === undefined && this.config.safety?.auto_apply) {
+      options.autoApprove = true;
+    }
+
     // Set up coordination for entire pipeline
     if (pipeline.full_coordination) {
       await this.coordinationHub.initializePipeline(pipeline);
@@ -371,7 +376,7 @@ class Orchestrator {
       });
 
       // Create checkpoint after each phase
-      await this.createCheckpoint(`phase-${phase.name}`);
+      await this.createCheckpoint(`phase-${phase.name.replace(/\s+/g, '-')}`);
 
       // Generate phase report
       await this.reportGenerator.generatePhaseReport(phase.name, phaseResults);

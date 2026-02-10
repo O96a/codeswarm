@@ -50,9 +50,22 @@ class SafetyManager {
       return { type: 'go', testCommand: 'go test ./...' };
     }
 
-    // Docker-compose projects (like terab)
+    // Docker-compose projects - check for nested test frameworks
     if (fs.existsSync(path.join(cwd, 'docker-compose.yml')) ||
         fs.existsSync(path.join(cwd, 'compose.yaml'))) {
+      // Check if there's also a package.json with test script (Node.js in Docker)
+      if (fs.existsSync(path.join(cwd, 'package.json'))) {
+        const pkg = fs.readJSONSync(path.join(cwd, 'package.json'));
+        if (pkg.scripts?.test && !pkg.scripts.test.includes('echo')) {
+          return { type: 'docker-node', testCommand: pkg.scripts.test };
+        }
+      }
+      // Check for Python in Docker
+      if (fs.existsSync(path.join(cwd, 'requirements.txt')) &&
+          (fs.existsSync(path.join(cwd, 'pytest.ini')) || fs.existsSync(path.join(cwd, 'tests')))) {
+        return { type: 'docker-python', testCommand: 'pytest' };
+      }
+      // No detectable tests in Docker project
       return { type: 'docker', testCommand: null };
     }
 
