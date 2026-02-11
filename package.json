@@ -4,7 +4,7 @@
   "description": "Mehaisi CodeSwarm: State-of-the-art multi-agent AI orchestration system for code quality, security, and performance optimization. Powered by SONA self-learning and vector memory.",
   "main": "lib/index.js",
   "bin": {
-    "codeswarm": "./codeswarm.js"
+    "codeswarm": "codeswarm.js"
   },
   "keywords": [
     "ai",
@@ -60,7 +60,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/O96a/codeswarm.git"
+    "url": "git+https://github.com/O96a/codeswarm.git"
   },
   "bugs": {
     "url": "https://github.com/O96a/codeswarm/issues"
