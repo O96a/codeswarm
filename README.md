@@ -130,14 +130,14 @@ codeswarm workflow investigate
 ### Install via NPM
 
 ```bash
-npm install -g mehaisi
+npm install -g mehaisi-codeswarm
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/O96a/mehaisi.git
-cd mehaisi
+git clone https://github.com/O96a/codeswarm.git
+cd codeswarm
 npm install
 npm link
 ```

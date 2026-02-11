@@ -62,19 +62,19 @@ source ~/.bashrc
 
 ### Global Installation (Recommended)
 ```bash
-npm install -g mehaisi
+npm install -g mehaisi-codeswarm
 ```
 
 ### Local Installation (Per Project)
 ```bash
-npm install --save-dev mehaisi
-# Run via npx mehaisi
+npm install --save-dev mehaisi-codeswarm
+# Run via npx codeswarm
 ```
 
 ### From Source
 ```bash
-git clone https://github.com/O96a/mehaisi.git
-cd mehaisi
+git clone https://github.com/O96a/codeswarm.git
+cd codeswarm
 npm install
 npm link
 ```
@@ -118,7 +118,7 @@ codeswarm status
 
 ## Troubleshooting
 
-### "command not found: mehaisi"
+### "command not found: codeswarm"
 - Ensure npm global bin is in PATH: `npm config get prefix`
 - Add to PATH: `export PATH=$PATH:$(npm config get prefix)/bin`
 
@@ -133,7 +133,7 @@ codeswarm status
 - Verify environment variables are set
 
 ### "Permission denied"
-- Use sudo for global install: `sudo npm install -g mehaisi`
+- Use sudo for global install: `sudo npm install -g mehaisi-codeswarm-codeswarm`
 - Or configure npm prefix: `npm config set prefix ~/.npm-global`
 
 ## Next Steps
@@ -145,6 +145,6 @@ codeswarm status
 
 ## Getting Help
 
-- GitHub Issues: https://github.com/O96a/mehaisi/issues
+- GitHub Issues: https://github.com/O96a/codeswarm/issues
 - Documentation: README.md
 - Agent Customization: See templates/agents/
