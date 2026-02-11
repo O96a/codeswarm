@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-We support the latest version of Mehaisi. Please ensure you are running the latest version before reporting a vulnerability.
+We support the latest version of Mehaisi CodeSwarm. Please ensure you are running the latest version before reporting a vulnerability.
 
 | Version | Supported          |
 | ------- | ------------------ |
@@ -18,11 +18,11 @@ We take security seriously. If you find a security vulnerability, please do NOT 
 
 We will acknowledge your report within 48 hours and provide a timeline for a fix.
 
-## Security Best Practices for Mehaisi
+## Security Best Practices for Mehaisi CodeSwarm
 
-Mehaisi handles API keys and modifies codebases. Please follow these guidelines:
+Mehaisi CodeSwarm handles API keys and modifies codebases. Please follow these guidelines:
 
-- **Never commit `.mehaisi/config.json`**: This file contains sensitive API keys. It is added to `.gitignore` by default during `mehaisi init`.
+- **Never commit `.mehaisi/config.json`**: This file contains sensitive API keys. It is added to `.gitignore` by default during `codeswarm init`.
 - **Review changes before applying**: Use the `manual` safety mode to review code changes before they are committed.
-- **Run in isolated environments**: When possible, run Mehaisi in a CI/CD environment or a container to limit access to your host system.
+- **Run in isolated environments**: When possible, run Mehaisi CodeSwarm in a CI/CD environment or a container to limit access to your host system.
 - **Rotate API keys**: Regularly rotate your Ollama Cloud and Claude Code session tokens.

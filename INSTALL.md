@@ -58,7 +58,7 @@ echo 'export ANTHROPIC_BASE_URL=http://localhost:11434' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## Install Mehaisi
+## Install Mehaisi CodeSwarm
 
 ### Global Installation (Recommended)
 ```bash
@@ -82,8 +82,8 @@ npm link
 ## Verify Installation
 
 ```bash
-# Check Mehaisi
-mehaisi --version
+# Check Mehaisi CodeSwarm
+codeswarm --version
 
 # Check prerequisites
 git --version
@@ -95,7 +95,7 @@ claude --version
 
 ```bash
 cd your-project
-mehaisi init
+codeswarm init
 
 # You should see:
 # ✓ 19 agents configured
@@ -107,13 +107,13 @@ mehaisi init
 
 ```bash
 # List agents
-mehaisi agents --list
+codeswarm agents --list
 
 # Run a safe investigator agent
-mehaisi run api-detective
+codeswarm run api-detective
 
 # Check status
-mehaisi status
+codeswarm status
 ```
 
 ## Troubleshooting
@@ -139,7 +139,7 @@ mehaisi status
 ## Next Steps
 
 1. Read the README.md for usage examples
-2. Run `mehaisi workflow investigate` on your project
+2. Run `codeswarm workflow investigate` on your project
 3. Review the generated reports in `.mehaisi/sessions/`
 4. Customize agents in `.mehaisi/agents/`
 

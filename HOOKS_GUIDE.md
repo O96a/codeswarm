@@ -2,7 +2,7 @@
 
 ## Overview
 
-Claude Code Hooks enable Mehaisi to capture and learn from actual agent interactions. This creates a feedback loop where the system improves routing decisions based on real-world outcomes.
+Claude Code Hooks enable Mehaisi CodeSwarm to capture and learn from actual agent interactions. This creates a feedback loop where the system improves routing decisions based on real-world outcomes.
 
 ## What Gets Captured
 
@@ -121,10 +121,10 @@ Visualize learning progress and routing improvements.
 
 ### Step 1: Initialize Hooks System
 
-Run during `mehaisi init` or as standalone command:
+Run during `codeswarm init` or as standalone command:
 
 ```bash
-mehaisi hooks init
+codeswarm hooks init
 ```
 
 This creates:
@@ -157,25 +157,25 @@ Hooks are automatically enabled when `coordination.learning.enabled = true` in c
 No changes needed - hooks capture data transparently:
 
 ```bash
-mehaisi run security-scanner
-mehaisi workflow fix-apis
-mehaisi coordinate --goal "Optimize performance"
+codeswarm run security-scanner
+codeswarm workflow fix-apis
+codeswarm coordinate --goal "Optimize performance"
 ```
 
 ### Step 4: View Learning Progress
 
 ```bash
 # Show learning dashboard
-mehaisi learning dashboard
+codeswarm learning dashboard
 
 # Show routing accuracy improvements
-mehaisi learning stats
+codeswarm learning stats
 
 # Show discovered capabilities
-mehaisi learning capabilities
+codeswarm learning capabilities
 
 # Export learning data
-mehaisi learning export --format json > learning-data.json
+codeswarm learning export --format json > learning-data.json
 ```
 
 ### Step 5: Apply Learned Improvements
@@ -184,13 +184,13 @@ Learning is applied automatically, but you can review/adjust:
 
 ```bash
 # Show current routing weights
-mehaisi learning weights
+codeswarm learning weights
 
 # Reset weights to defaults
-mehaisi learning weights --reset
+codeswarm learning weights --reset
 
 # Manually adjust weight (not recommended)
-mehaisi learning weights --capability 0.5 --semantic 0.3 --success 0.2
+codeswarm learning weights --capability 0.5 --semantic 0.3 --success 0.2
 ```
 
 ## File Operations Capture
@@ -377,7 +377,7 @@ const patterns = await learner.extractPatterns({
 ### Privacy & Safety
 - File contents are NOT captured (only paths/sizes)
 - API keys and secrets filtered from command outputs
-- User can disable hooks anytime: `mehaisi config set learning.enabled false`
+- User can disable hooks anytime: `codeswarm config set learning.enabled false`
 
 ## Testing Hooks
 
@@ -385,7 +385,7 @@ const patterns = await learner.extractPatterns({
 
 ```bash
 # Run an agent with hooks enabled
-mehaisi run test-writer --debug-hooks
+codeswarm run test-writer --debug-hooks
 
 # Check events were captured
 cat .mehaisi/sessions/latest/hooks/events.jsonl
@@ -401,11 +401,11 @@ cat .mehaisi/sessions/latest/hooks/events.jsonl
 ```bash
 # Run multiple sessions with same task type
 for i in {1..5}; do
-  mehaisi run security-scanner
+  codeswarm run security-scanner
 done
 
 # Check if learning data accumulated
-mehaisi learning stats
+codeswarm learning stats
 
 # Should show:
 # Sessions analyzed: 5
@@ -419,7 +419,7 @@ mehaisi learning stats
 
 1. Check learning is enabled:
    ```bash
-   mehaisi config get coordination.learning.enabled
+   codeswarm config get coordination.learning.enabled
    # Should return: true
    ```
 
@@ -430,20 +430,20 @@ mehaisi learning stats
 
 3. Run with debug mode:
    ```bash
-   mehaisi run <agent> --debug-hooks
+   codeswarm run <agent> --debug-hooks
    ```
 
 ### Learning Not Improving Routing
 
 1. Need more sessions (minimum 5-10):
    ```bash
-   mehaisi learning stats
+   codeswarm learning stats
    # Check "Sessions analyzed" count
    ```
 
 2. Check weight adjustments are allowed:
    ```bash
-   mehaisi config get coordination.learning.auto_adjust_weights
+   codeswarm config get coordination.learning.auto_adjust_weights
    # Should return: true
    ```
 

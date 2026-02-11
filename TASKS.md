@@ -1,4 +1,4 @@
-# Mehaisi — Implementation Tasks
+# Mehaisi CodeSwarm — Implementation Tasks
 
 > **Project Status:** ✅ Phase A Complete | ✅ Phase B Complete | ✅ Phase C Complete (Self-Learning SONA System)
 > **Last Updated:** 2026-02-10 (Self-Learning Implementation)
@@ -8,7 +8,7 @@
 
 ## Phase A: Foundation ✅ COMPLETE
 
-### A1. Rebrand: CodeSwarm → Mehaisi ✅
+### A1. Rebrand: CodeSwarm → Mehaisi CodeSwarm ✅
 - [x] Rename `codeswarm.js` → `mehaisi.js`
 - [x] Update `package.json` (name, bin, repository URLs)
 - [x] Update all string references in source files:
@@ -72,7 +72,7 @@
 - [x] Create `selectBestAgent` method combining keyword matching and similarity scoring
 - [x] Add routing confidence thresholds and scoring system
 - [x] Integrate with `orchestrator.js` for workflow agent selection
-- [x] Add CLI command `mehaisi recommend <task>` for testing routing
+- [x] Add CLI command `codeswarm recommend <task>` for testing routing
 - [x] Write comprehensive unit tests (24 tests, all passing)
 
 ---
@@ -128,7 +128,7 @@
 ---
 
 ### What's Been Completed
-1. **Complete Rebrand** ✅ — All references changed from CodeSwarm to Mehaisi
+1. **Complete Rebrand** ✅ — All references changed from CodeSwarm to Mehaisi CodeSwarm
 2. **LLM Provider Abstraction** ✅ — Modular backend ready for multiple providers
 3. **Parallel Executor Integration** ✅ — Full integration with Orchestrator (max 3 instances)
 4. **RuVector Installation** ✅ — Vector DB available for semantic search
@@ -182,7 +182,7 @@ The system now includes smart agent selection that combines:
 
 **CLI Command:**
 ```bash
-mehaisi recommend "Find and fix API security issues"
+codeswarm recommend "Find and fix API security issues"
 # Output:
 # ✓ Recommended Agent: Security Scanner
 # Confidence: 85%
@@ -212,11 +212,11 @@ The system now learns from every interaction to improve routing decisions over t
 
 3. **Learning Dashboard** — Comprehensive visualization:
    ```bash
-   mehaisi learning dashboard    # Full dashboard with stats, patterns, history
-   mehaisi learning stats         # Quick stats overview
-   mehaisi learning weights       # Show current routing weights
-   mehaisi learning weights:reset # Reset to defaults
-   mehaisi learning export        # Export learning data as JSON
+   codeswarm learning dashboard    # Full dashboard with stats, patterns, history
+   codeswarm learning stats         # Quick stats overview
+   codeswarm learning weights       # Show current routing weights
+   codeswarm learning weights:reset # Reset to defaults
+   codeswarm learning export        # Export learning data as JSON
    ```
 
 4. **Configuration** — Learning enabled by default in config.json:
@@ -237,7 +237,7 @@ The system now learns from every interaction to improve routing decisions over t
 5. **Privacy & Security**:
    - File contents NOT captured (only paths and operations)
    - Sensitive data filtered (API keys, passwords, tokens)
-   - User can disable anytime: `mehaisi config set coordination.learning.enabled false`
+   - User can disable anytime: `codeswarm config set coordination.learning.enabled false`
    - All data stored locally in `.mehaisi/learning/`
 
 **Expected Benefits:**
@@ -482,8 +482,8 @@ SESSION_TIMEOUT_MS: 3600000  // 1 hour
 
 **CONGRATULATIONS!** All core planned features (Phase A + Phase B) are **100% COMPLETE** ✅
 
-The Mehaisi multi-agent orchestration system is now **production-ready** with:
-- ✅ Complete rebrand from CodeSwarm to Mehaisi
+The Mehaisi CodeSwarm multi-agent orchestration system is now **production-ready** with:
+- ✅ Complete rebrand from CodeSwarm to Mehaisi CodeSwarm
 - ✅ Multi-provider LLM abstraction (Ollama Cloud/Local, Claude Code)
 - ✅ Parallel execution with hard limits (max 3 agents, 10min timeout)
 - ✅ Vector memory for semantic search (RuVector integration)
@@ -519,7 +519,7 @@ The system is complete and ready for production. Here are enhancement opportunit
 #### Option 1: Phase C - Self-Learning System 🧠
 **Difficulty:** Medium | **Impact:** High | **Fun Factor:** ⭐⭐⭐⭐⭐
 
-Implement adaptive learning so Mehaisi gets smarter over time:
+Implement adaptive learning so Mehaisi CodeSwarm gets smarter over time:
 
 1. **Claude Code Hooks** (Easiest starting point)
    - Document hook setup process
@@ -775,7 +775,7 @@ console.log(`Reason: ${routing.reason}`);
    - Fallback to specified agent on low confidence
 
 3. **CLI Command**
-   - `mehaisi recommend <task>` for testing routing
+   - `codeswarm recommend <task>` for testing routing
    - Shows recommended agent, confidence, alternatives
    - Provides runnable command suggestion
 

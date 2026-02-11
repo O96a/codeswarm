@@ -5,14 +5,13 @@ const ui = require('./ui-formatter');
 
 async function showStatus() {
   const mehaisiDir = path.join(process.cwd(), '.mehaisi');
-  
+
   if (!await fs.pathExists(mehaisiDir)) {
-    ui.error('Not initialized. Run: mehaisi init');
+    ui.error('Mehaisi CodeSwarm not initialized. Run: codeswarm init');
     return;
   }
 
-  ui.header('System Status', 'gear');
-  
+  ui.header('Mehaisi CodeSwarm Status', 'gear');  
   const config = await fs.readJSON(path.join(mehaisiDir, 'config.json'));
   
   ui.section('Configuration');

@@ -1,6 +1,6 @@
 # Credential Management
 
-Mehaisi provides intelligent credential management that automatically prompts you for API keys when needed, eliminating the need to manually export environment variables.
+Mehaisi CodeSwarm provides intelligent credential management that automatically prompts you for API keys when needed, eliminating the need to manually export environment variables.
 
 ## Quick Start
 
@@ -8,13 +8,13 @@ Mehaisi provides intelligent credential management that automatically prompts yo
 
 ```bash
 cd your-project
-mehaisi init --model kimi-k2.5:cloud
+codeswarm init --model kimi-k2.5:cloud
 ```
 
 ### 2. Setup Credentials (Interactive)
 
 ```bash
-mehaisi credentials
+codeswarm credentials
 ```
 
 This command will:
@@ -43,7 +43,7 @@ Provider: ollama-cloud
 
 ```bash
 # No export needed! Just run your command
-mehaisi pipeline cautious
+codeswarm pipeline cautious
 
 # If credentials are missing, you'll be prompted automatically
 ```
@@ -59,7 +59,7 @@ When you run any command that requires credentials:
 3. **Prompt interactively** if credentials not found
 4. **Cache in memory** for the session
 
-You're **never blocked** - Mehaisi will always ask when it needs something.
+You're **never blocked** - Mehaisi CodeSwarm will always ask when it needs something.
 
 ### Credential Priority
 
@@ -75,7 +75,7 @@ You're **never blocked** - Mehaisi will always ask when it needs something.
 
 ```bash
 # Interactively setup credentials for all providers
-mehaisi credentials
+codeswarm credentials
 ```
 
 ### Per-Provider Setup
@@ -84,7 +84,7 @@ Credentials are requested automatically when you use a provider:
 
 ```bash
 # First time running with ollama-cloud
-mehaisi run api-detective
+codeswarm run api-detective
 
 # You'll be prompted:
 ⚠  Ollama Cloud API key not found
@@ -117,7 +117,7 @@ Set once per session:
 
 ```bash
 export OLLAMA_CLOUD_API_KEY="your-key-here"
-mehaisi pipeline cautious
+codeswarm pipeline cautious
 ```
 
 **Pros:**
@@ -146,7 +146,7 @@ You'll be prompted every time the credential is needed.
 Get API key from: https://ollama.com
 
 ```bash
-mehaisi credentials
+codeswarm credentials
 # Or manually:
 export OLLAMA_CLOUD_API_KEY="your-key-here"
 ```
@@ -170,7 +170,7 @@ export CLAUDE_CODE_SESSION_ACCESS_TOKEN="your-token"
 Get API key from: https://platform.openai.com/api-keys
 
 ```bash
-mehaisi credentials
+codeswarm credentials
 # Or manually:
 export OPENAI_API_KEY="sk-..."
 ```
@@ -212,14 +212,14 @@ Check the config file:
 cat .mehaisi/config.json | grep api_key
 ```
 
-If missing, run `mehaisi credentials` again.
+If missing, run `codeswarm credentials` again.
 
 ### Want to change saved credential
 
 Edit `.mehaisi/config.json` or run:
 
 ```bash
-mehaisi credentials  # Re-enter when prompted
+codeswarm credentials  # Re-enter when prompted
 ```
 
 ### 401 Unauthorized after setup
@@ -238,18 +238,18 @@ If you've been manually exporting keys:
 # Required before every command ❌
 export OLLAMA_CLOUD_API_KEY="key"
 export CLAUDE_CODE_SESSION_ACCESS_TOKEN="token"
-mehaisi pipeline cautious
+codeswarm pipeline cautious
 ```
 
 ### After
 ```bash
 # One-time setup ✅
-mehaisi credentials
+codeswarm credentials
 
 # Then just run commands
-mehaisi pipeline cautious
-mehaisi run api-detective
-mehaisi workflow investigate
+codeswarm pipeline cautious
+codeswarm run api-detective
+codeswarm workflow investigate
 ```
 
 ## Summary
@@ -260,4 +260,4 @@ mehaisi workflow investigate
 ✅ **Secure by default** - Config files are gitignored  
 ✅ **Provider-agnostic** - Works with all configured providers  
 
-Just run `mehaisi credentials` once and you're ready to go!
+Just run `codeswarm credentials` once and you're ready to go!

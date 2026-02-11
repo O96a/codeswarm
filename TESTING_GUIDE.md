@@ -1,4 +1,4 @@
-# Manual Testing Guide for Mehaisi on Terab Project
+# Manual Testing Guide for Mehaisi CodeSwarm on Terab Project
 
 ## Prerequisites Check
 
@@ -22,7 +22,7 @@ git status  # Should show repo status, not "not a git repository"
 
 ### Phase 1: Fresh Installation & Setup
 
-#### 1.1 Pull Latest Mehaisi Changes
+#### 1.1 Pull Latest Mehaisi CodeSwarm Changes
 ```bash
 cd ~/codeswarm
 git pull origin main
@@ -32,9 +32,9 @@ npm install  # Install any new dependencies (boxen)
 #### 1.2 Verify Link
 ```bash
 which mehaisi
-# Should show: /usr/local/bin/mehaisi or similar
+# Should show: /usr/local/bin/codeswarm or similar
 
-mehaisi --version
+codeswarm --version
 # Should show version number
 ```
 
@@ -46,7 +46,7 @@ cd ~/projects/terab
 rm -rf .mehaisi
 
 # Initialize with Ollama Cloud model
-mehaisi init --model kimi-k2.5:cloud
+codeswarm init --model kimi-k2.5:cloud
 ```
 
 **Expected Output:**
@@ -62,9 +62,9 @@ Configuration
   • Provider: ollama-cloud
 
 🎯 Get Started
-  1. mehaisi credentials · Setup API keys
-  2. mehaisi agents --list · View available agents
-  3. mehaisi pipeline cautious · Run full pipeline
+  1. codeswarm credentials · Setup API keys
+  2. codeswarm agents --list · View available agents
+  3. codeswarm pipeline cautious · Run full pipeline
 ```
 
 **What to Check:**
@@ -83,7 +83,7 @@ Configuration
 cd ~/projects/terab
 
 # Run credential setup (the new interactive feature!)
-mehaisi credentials
+codeswarm credentials
 ```
 
 **Expected Prompt:**
@@ -133,7 +133,7 @@ cat .mehaisi/config.json | grep api_key
 
 #### 3.1 Test Status Command
 ```bash
-mehaisi status
+codeswarm status
 ```
 
 **Expected Output:**
@@ -157,7 +157,7 @@ Configuration
 
 #### 3.2 Test Agents List Command
 ```bash
-mehaisi agents --list
+codeswarm agents --list
 ```
 
 **Expected Output:**
@@ -205,7 +205,7 @@ cat .mehaisi/config.json | head -30
 #### 4.2 Test Model Override (Optional)
 ```bash
 # This tests that your global model overrides agent defaults
-mehaisi run api-detective --dry-run 2>&1 | grep -i model
+codeswarm run api-detective --dry-run 2>&1 | grep -i model
 ```
 
 **Expected Behavior:**
@@ -221,7 +221,7 @@ mehaisi run api-detective --dry-run 2>&1 | grep -i model
 cd ~/projects/terab
 
 # Run the cautious pipeline (safest, read-only investigations)
-mehaisi pipeline cautious
+codeswarm pipeline cautious
 ```
 
 **Expected Output:**
@@ -271,7 +271,7 @@ Workflow: investigate
 #### 5.2 Check Results
 ```bash
 # View the most recent session report
-mehaisi report --last
+codeswarm report --last
 ```
 
 **Expected Output:**
@@ -288,7 +288,7 @@ mehaisi report --last
 cd ~/projects/terab
 
 # Run another command - should NOT ask for credentials
-mehaisi run security-scanner
+codeswarm run security-scanner
 ```
 
 **Expected Behavior:**
@@ -303,7 +303,7 @@ cat .mehaisi/config.json | grep -v "api_key" > /tmp/config-temp.json
 mv /tmp/config-temp.json .mehaisi/config.json
 
 # Run again - should prompt this time
-mehaisi run api-detective
+codeswarm run api-detective
 ```
 
 **Expected Behavior:**
@@ -315,7 +315,7 @@ mehaisi run api-detective
 ```bash
 # Save credentials again when prompted
 # Or restore manually:
-mehaisi credentials
+codeswarm credentials
 ```
 
 ---
@@ -327,7 +327,7 @@ mehaisi credentials
 # Temporarily set wrong API key
 export OLLAMA_CLOUD_API_KEY="invalid-key-12345"
 
-mehaisi run api-detective
+codeswarm run api-detective
 ```
 
 **Expected Output:**
@@ -345,7 +345,7 @@ unset OLLAMA_CLOUD_API_KEY
 # This tests graceful failure
 # Temporarily block network or disconnect
 
-mehaisi run api-detective
+codeswarm run api-detective
 ```
 
 **Expected Behavior:**
@@ -443,21 +443,21 @@ If you just want to quickly verify everything works:
 cd ~/projects/terab
 
 # 2. Initialize
-rm -rf .mehaisi && mehaisi init --model kimi-k2.5:cloud
+rm -rf .codeswarm && codeswarm init --model kimi-k2.5:cloud
 
 # 3. Setup credentials
-mehaisi credentials
+codeswarm credentials
 # Enter: 59064537a0604b5fa23d0f2c9a4cd0a2.OS7nVy9sUJAYhlLOwpOBWgM6
 # Choose: Yes (save to config)
 
 # 4. Check status
-mehaisi status
+codeswarm status
 
 # 5. List agents
-mehaisi agents --list
+codeswarm agents --list
 
 # 6. Run one agent
-mehaisi run api-detective
+codeswarm run api-detective
 
 # Done! If these all work with clean output, you're good!
 ```
@@ -488,7 +488,7 @@ Use this to track your testing progress:
 If you encounter any issues:
 
 1. Check `~/.mehaisi/temp/` for error logs
-2. Run with verbose mode: `MEHAISI_VERBOSE=1 mehaisi [command]`
+2. Run with verbose mode: `MEHAISI_VERBOSE=1 codeswarm [command]`
 3. Check the guides:
    - [CREDENTIALS_GUIDE.md](CREDENTIALS_GUIDE.md)
    - [MODEL_SELECTION_GUIDE.md](MODEL_SELECTION_GUIDE.md)

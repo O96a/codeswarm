@@ -1,6 +1,6 @@
-# Contributing to Mehaisi 🐝
+# Contributing to Mehaisi CodeSwarm 🐝
 
-First off, thank you for considering contributing to Mehaisi! It's people like you that make Mehaisi such a great tool.
+First off, thank you for considering contributing to Mehaisi CodeSwarm! It's people like you that make Mehaisi CodeSwarm such a great tool.
 
 ## Code of Conduct
 

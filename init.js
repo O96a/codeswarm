@@ -6,7 +6,7 @@ const inquirer = require('inquirer');
 const ui = require('./ui-formatter');
 
 async function initializeProject(options) {
-  ui.header('Initializing Mehaisi', 'rocket');
+  ui.header('Initializing Mehaisi CodeSwarm', 'rocket');
 
   const cwd = process.cwd();
   const mehaisiDir = path.join(cwd, '.mehaisi');
@@ -16,7 +16,7 @@ async function initializeProject(options) {
     const { reinit } = await inquirer.prompt([{
       type: 'confirm',
       name: 'reinit',
-      message: 'Mehaisi already initialized. Reinitialize?',
+      message: 'Mehaisi CodeSwarm already initialized. Reinitialize?',
       default: false
     }]);
     if (!reinit) return;
@@ -153,16 +153,16 @@ async function initializeProject(options) {
 
     spinner.succeed('Initialization complete');
 
-    ui.section('Configuration');
+    ui.section('Mehaisi CodeSwarm Configuration');
     ui.item(`${chalk.bold('19')} agents configured`, 0);
     ui.item(`Workflows & pipelines ready`, 0);
     ui.item(`Model: ${chalk.cyan(selectedModel)}`, 0);
     ui.item(`Provider: ${chalk.cyan(defaultProvider)}`, 0);
 
     ui.nextSteps('Get Started', [
-      `${chalk.cyan('mehaisi credentials')} ${chalk.gray('· Setup API keys')}`,
-      `${chalk.cyan('mehaisi agents --list')} ${chalk.gray('· View available agents')}`,
-      `${chalk.cyan('mehaisi pipeline cautious')} ${chalk.gray('· Run full pipeline')}`
+      `${chalk.cyan('codeswarm credentials')} ${chalk.gray('· Setup API keys')}`,
+      `${chalk.cyan('codeswarm agents --list')} ${chalk.gray('· View available agents')}`,
+      `${chalk.cyan('codeswarm pipeline cautious')} ${chalk.gray('· Run full pipeline')}`
     ]);
 
   } catch (error) {

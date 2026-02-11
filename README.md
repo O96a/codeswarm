@@ -1,24 +1,24 @@
 <p align="center">
-  <img src="docs/assets/logo.svg" width="150" alt="Mehaisi Logo">
+  <img src="docs/assets/logo.svg" width="150" alt="Mehaisi CodeSwarm Logo">
 </p>
 
-<h1 align="center">Mehaisi 🐝</h1>
+<h1 align="center">Mehaisi CodeSwarm 🐝</h1>
 
 <p align="center">
   <strong>State-of-the-art Multi-Agent AI Code Orchestration System</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/O96a/mehaisi/actions"><img src="https://img.shields.io/badge/tests-258%2F276%20passing-brightgreen" alt="Tests"></a>
-  <a href="https://github.com/O96a/mehaisi/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"></a>
-  <a href="https://www.npmjs.com/package/mehaisi"><img src="https://img.shields.io/npm/v/mehaisi?color=orange" alt="NPM Version"></a>
+  <a href="https://github.com/O96a/codeswarm/actions"><img src="https://img.shields.io/badge/tests-258%2F276%20passing-brightgreen" alt="Tests"></a>
+  <a href="https://github.com/O96a/codeswarm/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"></a>
+  <a href="https://www.npmjs.com/package/mehaisi-codeswarm"><img src="https://img.shields.io/npm/v/mehaisi-codeswarm?color=orange" alt="NPM Version"></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D16.0.0-blue" alt="Node Support"></a>
-  <a href="https://github.com/O96a/mehaisi/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs Welcome"></a>
+  <a href="https://github.com/O96a/codeswarm/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs Welcome"></a>
   <a href="https://twitter.com/intent/follow?screen_name=O96a"><img src="https://img.shields.io/twitter/follow/O96a?style=social" alt="Twitter Follow"></a>
 </p>
 
 <p align="center">
-  Transform messy codebases into production-grade applications using AI agents that learn, coordinate, and make smart decisions. Mehaisi leverages <strong>SONA</strong> (Self-Optimizing Network of Agents) to provide intelligent routing, parallel execution, and semantic memory.
+  Transform messy codebases into production-grade applications using AI agents that learn, coordinate, and make smart decisions. <strong>Mehaisi CodeSwarm</strong> leverages <strong>SONA</strong> (Self-Optimizing Network of Agents) to provide intelligent routing, parallel execution, and semantic memory.
 </p>
 
 ---
@@ -26,7 +26,7 @@
 ## 📖 Table of Contents
 
 - [✨ Key Features](#-key-features)
-- [🧠 Why Mehaisi?](#-why-mehaisi)
+- [🧠 Why Mehaisi CodeSwarm?](#-why-mehaisi)
 - [📐 Architecture](#-architecture)
 - [🚀 Quick Start](#-quick-start)
 - [🛠️ Installation](#-installation)
@@ -65,11 +65,11 @@
 
 ---
 
-## 🧠 Why Mehaisi?
+## 🧠 Why Mehaisi CodeSwarm?
 
-Traditional code quality tools are static. Mehaisi is **dynamic**:
+Traditional code quality tools are static. Mehaisi CodeSwarm is **dynamic**:
 
-1. **It Learns**: Unlike static linters, Mehaisi remembers what worked and what didn't.
+1. **It Learns**: Unlike static linters, Mehaisi CodeSwarm remembers what worked and what didn't.
 2. **It Coordinates**: Agents don't work in silos; they share findings through a central hub.
 3. **It's Safe**: Built-in Git-based rollbacks and test validation ensure your code never breaks.
 4. **It's Fast**: Parallel execution allows for rapid analysis and fixing of large repositories.
@@ -104,16 +104,16 @@ graph TD
 
 ```bash
 # 1. Initialize in your project
-mehaisi init
+codeswarm init
 
 # 2. Setup credentials interactively
-mehaisi credentials
+codeswarm credentials
 
 # 3. Get intelligent agent recommendation
-mehaisi recommend "Fix security vulnerabilities in my API"
+codeswarm recommend "Fix security vulnerabilities in my API"
 
 # 4. Run investigation workflow
-mehaisi workflow investigate
+codeswarm workflow investigate
 ```
 
 ---
@@ -148,10 +148,10 @@ npm link
 
 ### Interactive Setup
 
-Mehaisi features an **intelligent configuration manager**. No need to manually edit JSON files.
+Mehaisi CodeSwarm features an **intelligent configuration manager**. No need to manually edit JSON files.
 
 ```bash
-mehaisi config --interactive
+codeswarm config --interactive
 ```
 
 ### Credential Management
@@ -159,14 +159,14 @@ mehaisi config --interactive
 Securely manage your API keys for Ollama Cloud and Claude Code.
 
 ```bash
-mehaisi credentials
+codeswarm credentials
 ```
 
 ---
 
 ## 🤖 Agent Types
 
-Mehaisi comes with **19 specialized agents**:
+Mehaisi CodeSwarm comes with **19 specialized agents**:
 
 | Category | Agents |
 | :--- | :--- |
@@ -179,7 +179,7 @@ Mehaisi comes with **19 specialized agents**:
 
 ## 🧪 Testing
 
-Mehaisi is built with reliability in mind.
+Mehaisi CodeSwarm is built with reliability in mind.
 
 ```bash
 # Run the full test suite

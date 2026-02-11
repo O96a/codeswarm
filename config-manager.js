@@ -14,7 +14,7 @@ async function configureSettings(options) {
   const configPath = path.join(process.cwd(), '.mehaisi', 'config.json');
   
   if (!await fs.pathExists(configPath)) {
-    ui.error('Mehaisi not initialized. Run: mehaisi init');
+    ui.error('Mehaisi CodeSwarm not initialized. Run: codeswarm init');
     return;
   }
 

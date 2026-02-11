@@ -9,7 +9,7 @@ async function listAgents(options) {
   const agentsDir = path.join(process.cwd(), '.mehaisi', 'agents');
   
   if (!await fs.pathExists(agentsDir)) {
-    ui.error('Mehaisi not initialized. Run: mehaisi init');
+    ui.error('Mehaisi CodeSwarm not initialized. Run: codeswarm init');
     return;
   }
 

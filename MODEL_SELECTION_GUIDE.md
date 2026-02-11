@@ -1,18 +1,18 @@
 # Model Selection Guide
 
-This guide explains how Mehaisi handles model selection and provider routing.
+This guide explains how Mehaisi CodeSwarm handles model selection and provider routing.
 
 ## Overview
 
-Mehaisi uses a **ModelResolver** system that intelligently selects the appropriate model and provider for each agent execution. This ensures consistency while allowing flexibility when needed.
+Mehaisi CodeSwarm uses a **ModelResolver** system that intelligently selects the appropriate model and provider for each agent execution. This ensures consistency while allowing flexibility when needed.
 
 ## Model Selection Priority
 
 The system follows a clear priority hierarchy (highest to lowest):
 
 ```
-1. Runtime Override    → mehaisi run agent --model <model>
-2. Global Config       → mehaisi init --model <model>
+1. Runtime Override    → codeswarm run agent --model <model>
+2. Global Config       → codeswarm init --model <model>
 3. Agent Default       → model: ... in agent YAML
 4. Provider Default    → From provider configuration
 ```
@@ -21,12 +21,12 @@ The system follows a clear priority hierarchy (highest to lowest):
 
 ```bash
 # Set global model during initialization
-mehaisi init --model kimi-k2.5:cloud
+codeswarm init --model kimi-k2.5:cloud
 
 # All agents will use kimi-k2.5:cloud by default
 
 # Override for a specific run
-mehaisi run api-detective --model qwen3-coder
+codeswarm run api-detective --model qwen3-coder
 
 # This agent will use qwen3-coder, others still use kimi-k2.5:cloud
 ```
@@ -88,13 +88,13 @@ priority: 1
 
 ## Authentication
 
-Mehaisi provides an **interactive credentials setup** command that prompts you for API keys when needed, instead of requiring manual environment variable exports.
+Mehaisi CodeSwarm provides an **interactive credentials setup** command that prompts you for API keys when needed, instead of requiring manual environment variable exports.
 
 ### Quick Setup (Recommended)
 
 ```bash
 # After initialization, run the credentials command
-mehaisi credentials
+codeswarm credentials
 
 # This will interactively prompt for any missing API keys
 # and optionally save them to your config file
@@ -104,7 +104,7 @@ mehaisi credentials
 
 **Option 1: Interactive Setup (Recommended)**
 ```bash
-mehaisi credentials
+codeswarm credentials
 # When prompted, enter your API key
 # Choose whether to save it to config
 ```
@@ -128,7 +128,7 @@ Edit `.mehaisi/config.json`:
 }
 ```
 
-**No manual exports needed!** When you run any command that requires an API key, Mehaisi will automatically prompt you if it's missing.
+**No manual exports needed!** When you run any command that requires an API key, Mehaisi CodeSwarm will automatically prompt you if it's missing.
 
 ### Ollama Local
 
@@ -159,7 +159,7 @@ Enable verbose mode to see resolution details:
 
 ```bash
 export MEHAISI_VERBOSE=1
-mehaisi run api-detective
+codeswarm run api-detective
 ```
 
 Output:
@@ -176,9 +176,9 @@ Output:
 ### Scenario 1: Use Ollama Cloud for Everything
 
 ```bash
-mehaisi init --model kimi-k2.5:cloud
+codeswarm init --model kimi-k2.5:cloud
 export OLLAMA_CLOUD_API_KEY="your-key"
-mehaisi pipeline cautious
+codeswarm pipeline cautious
 ```
 
 All agents use `kimi-k2.5:cloud` via Ollama Cloud.
@@ -190,21 +190,21 @@ All agents use `kimi-k2.5:cloud` via Ollama Cloud.
 ollama serve
 
 # Initialize with local model
-mehaisi init --model kimi-k2.5:local
+codeswarm init --model kimi-k2.5:local
 
 # Run without API keys
-mehaisi pipeline balanced
+codeswarm pipeline balanced
 ```
 
 ### Scenario 3: Mixed Usage
 
 ```bash
 # Use cloud by default
-mehaisi init --model kimi-k2.5:cloud
+codeswarm init --model kimi-k2.5:cloud
 export OLLAMA_CLOUD_API_KEY="your-key"
 
 # Override for specific agents
-mehaisi run code-janitor --model qwen3-coder:local
+codeswarm run code-janitor --model qwen3-coder:local
 ```
 
 ### Scenario 4: Per-Agent Models
@@ -246,7 +246,7 @@ The model isn't available on your provider. Either:
 Check resolution with verbose mode:
 ```bash
 export MEHAISI_VERBOSE=1
-mehaisi run agent-name
+codeswarm run agent-name
 ```
 
 ## Best Practices

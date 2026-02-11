@@ -4,37 +4,37 @@
 
 ```bash
 # Setup
-mehaisi init                    # Initialize in project
-mehaisi status                  # Show current status
+codeswarm init                    # Initialize in project
+codeswarm status                  # Show current status
 
 # Run agents
-mehaisi run <agent-name>        # Run single agent
-mehaisi agents --list           # List all agents
+codeswarm run <agent-name>        # Run single agent
+codeswarm agents --list           # List all agents
 
 # Workflows
-mehaisi workflow investigate    # Find all issues
-mehaisi workflow cleanup        # Clean dead code
-mehaisi workflow fix-apis       # Fix API issues
-mehaisi workflow fix-ui         # Fix UI issues
-mehaisi workflow optimize       # Optimize code
-mehaisi workflow validate       # Run QA
+codeswarm workflow investigate    # Find all issues
+codeswarm workflow cleanup        # Clean dead code
+codeswarm workflow fix-apis       # Fix API issues
+codeswarm workflow fix-ui         # Fix UI issues
+codeswarm workflow optimize       # Optimize code
+codeswarm workflow validate       # Run QA
 
 # Pipelines (Full transformation)
-mehaisi pipeline cautious       # Safe, step-by-step
-mehaisi pipeline balanced       # Balanced approach
-mehaisi pipeline aggressive     # Fast (risky)
+codeswarm pipeline cautious       # Safe, step-by-step
+codeswarm pipeline balanced       # Balanced approach
+codeswarm pipeline aggressive     # Fast (risky)
 
 # Coordination
-mehaisi coordinate --goal "Fix all API issues"
+codeswarm coordinate --goal "Fix all API issues"
 
 # Reports & Status
-mehaisi report --last           # Last session report
-mehaisi diff --last             # Show changes
-mehaisi rollback                # Undo changes
+codeswarm report --last           # Last session report
+codeswarm diff --last             # Show changes
+codeswarm rollback                # Undo changes
 
 # Help
-mehaisi --help                  # General help
-mehaisi <command> --help        # Command help
+codeswarm --help                  # General help
+codeswarm <command> --help        # Command help
 ```
 
 ## Agent Categories
@@ -61,27 +61,27 @@ mehaisi <command> --help        # Command help
 
 ```bash
 # 1. Initialize
-mehaisi init
+codeswarm init
 
 # 2. Investigate issues
-mehaisi workflow investigate
+codeswarm workflow investigate
 # Review: .mehaisi/sessions/[id]/reports/
 
 # 3. Clean up safe stuff
-mehaisi workflow cleanup
+codeswarm workflow cleanup
 
 # 4. Fix critical issues
-mehaisi workflow fix-apis
-mehaisi workflow fix-ui
+codeswarm workflow fix-apis
+codeswarm workflow fix-ui
 
 # 5. Optimize
-mehaisi workflow optimize
+codeswarm workflow optimize
 
 # 6. Validate
-mehaisi workflow validate
+codeswarm workflow validate
 
 # 7. Commit!
-git commit -m "Mehaisi: Production-ready transformation"
+git commit -m "Mehaisi CodeSwarm: Production-ready transformation"
 ```
 
 ## Configuration
@@ -126,5 +126,5 @@ Agents coordinate automatically through shared findings:
 
 Enable explicit coordination:
 ```bash
-mehaisi coordinate --goal "Your goal here"
+codeswarm coordinate --goal "Your goal here"
 ```

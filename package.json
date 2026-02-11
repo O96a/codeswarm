@@ -1,10 +1,10 @@
 {
-  "name": "mehaisi",
+  "name": "mehaisi-codeswarm",
   "version": "1.0.0",
-  "description": "State-of-the-art multi-agent AI orchestration system for code quality, security, and performance optimization. Powered by SONA self-learning and vector memory.",
+  "description": "Mehaisi CodeSwarm: State-of-the-art multi-agent AI orchestration system for code quality, security, and performance optimization. Powered by SONA self-learning and vector memory.",
   "main": "lib/index.js",
   "bin": {
-    "mehaisi": "./mehaisi.js"
+    "codeswarm": "./codeswarm.js"
   },
   "keywords": [
     "ai",

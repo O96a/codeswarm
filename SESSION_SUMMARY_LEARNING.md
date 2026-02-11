@@ -9,7 +9,7 @@
 
 ## 🎯 Objective
 
-Implement Phase C: Self-Learning system (SONA - Self-Optimizing Neural-inspired Agent router) to enable Mehaisi to learn from interactions and improve routing decisions over time.
+Implement Phase C: Self-Learning system (SONA - Self-Optimizing Neural-inspired Agent router) to enable Mehaisi CodeSwarm to learn from interactions and improve routing decisions over time.
 
 ---
 
@@ -128,19 +128,19 @@ Implement Phase C: Self-Learning system (SONA - Self-Optimizing Neural-inspired 
 
 **Commands Implemented:**
 ```bash
-mehaisi learning dashboard          # Full dashboard with all metrics
-mehaisi learning dashboard --history  # Include weight adjustment history
-mehaisi learning dashboard --patterns # Show learned task patterns
-mehaisi learning dashboard --capabilities # Show discovered capabilities
+codeswarm learning dashboard          # Full dashboard with all metrics
+codeswarm learning dashboard --history  # Include weight adjustment history
+codeswarm learning dashboard --patterns # Show learned task patterns
+codeswarm learning dashboard --capabilities # Show discovered capabilities
 
-mehaisi learning stats              # Quick stats overview
+codeswarm learning stats              # Quick stats overview
 
-mehaisi learning weights            # Show current weights
-mehaisi learning weights:reset      # Reset to defaults
-mehaisi learning weights:set --capability 0.5 --semantic 0.3 --success 0.2
+codeswarm learning weights            # Show current weights
+codeswarm learning weights:reset      # Reset to defaults
+codeswarm learning weights:set --capability 0.5 --semantic 0.3 --success 0.2
 
-mehaisi learning export             # Export data as JSON
-mehaisi learning export --format json > data.json
+codeswarm learning export             # Export data as JSON
+codeswarm learning export --format json > data.json
 ```
 
 **Dashboard Sections:**
@@ -190,7 +190,7 @@ mehaisi learning export --format json > data.json
 **Added learning command group:**
 
 ```bash
-mehaisi learning <action> [options]
+codeswarm learning <action> [options]
 ```
 
 **Available Actions:**
@@ -448,17 +448,17 @@ coordination-hub.js
 ### Example 1: View Learning Progress
 
 ```bash
-# Initialize Mehaisi
+# Initialize Mehaisi CodeSwarm
 cd /path/to/project
-mehaisi init
+codeswarm init
 
 # Run some agents (captured automatically)
-mehaisi run security-scanner
-mehaisi run test-writer
-mehaisi workflow investigate
+codeswarm run security-scanner
+codeswarm run test-writer
+codeswarm workflow investigate
 
 # View learning stats
-mehaisi learning stats
+codeswarm learning stats
 # Output:
 # 🧠 Learning Stats
 #   Sessions: 3
@@ -471,7 +471,7 @@ mehaisi learning stats
 
 ```bash
 # After 5+ sessions
-mehaisi learning dashboard --history --patterns
+codeswarm learning dashboard --history --patterns
 
 # Output:
 # 🧠 SONA Learning Dashboard
@@ -512,7 +512,7 @@ mehaisi learning dashboard --history --patterns
 ### Example 3: Export Learning Data
 
 ```bash
-mehaisi learning export --format json > learning-data.json
+codeswarm learning export --format json > learning-data.json
 
 # Use for analysis
 cat learning-data.json | jq '.statistics.topPerformingAgents'
@@ -522,7 +522,7 @@ cat learning-data.json | jq '.statistics.topPerformingAgents'
 
 ```bash
 # If routing becomes inaccurate, reset and start fresh
-mehaisi learning weights:reset
+codeswarm learning weights:reset
 
 # Learning data preserved, weights reset to defaults
 ```
@@ -612,7 +612,7 @@ Phase C implementation is **complete and production-ready**. The self-learning s
 ✅ **Privacy-first design** with sensitive data filtering  
 ✅ **User control** with config options  
 
-The system learns from every interaction and improves routing decisions over time, making Mehaisi truly adaptive and intelligent.
+The system learns from every interaction and improves routing decisions over time, making Mehaisi CodeSwarm truly adaptive and intelligent.
 
 **All planned features (Phase A, B, and C) are now complete!** 🎉
 

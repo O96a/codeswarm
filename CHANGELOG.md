@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **GitHub Integration**: Issue templates, PR templates, and automated topics.
 
 ### Changed
-- Rebranded project from CodeSwarm to Mehaisi 🐝.
+- Rebranded project from CodeSwarm to Mehaisi CodeSwarm 🐝.
 - Overhauled UIFormatter for consistent styling.
 - Improved ModelResolver for smarter model/provider pairing.
 

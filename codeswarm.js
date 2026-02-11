@@ -18,13 +18,13 @@ const program = new Command();
 
 program
   .name('codeswarm')
-  .description('Multi-agent AI code quality orchestration system')
+  .description('Mehaisi CodeSwarm: Multi-agent AI code quality orchestration system')
   .version(packageJson.version);
 
 // Initialize command
 program
   .command('init')
-  .description('Initialize CodeSwarm in the current repository')
+  .description('Initialize Mehaisi CodeSwarm in the current repository')
   .option('-t, --template <type>', 'Project template (react, node, python, vue, angular)', 'node')
   .option('-m, --model <model>', 'Default Ollama model', 'qwen3-coder')
   .action(initializeProject);
@@ -101,7 +101,7 @@ program
 // Status command
 program
   .command('status')
-  .description('Show current CodeSwarm status')
+  .description('Show current Mehaisi CodeSwarm status')
   .action(showStatus);
 
 // Credentials command
@@ -119,7 +119,7 @@ program
 // Config command
 program
   .command('config')
-  .description('Configure Mehaisi settings')
+  .description('Configure Mehaisi CodeSwarm settings')
   .option('-l, --list', 'Display current configuration')
   .option('-i, --interactive', 'Interactive configuration mode')
   .option('--auto-apply <boolean>', 'Enable/disable auto-apply (true/false)', (val) => val === 'true')

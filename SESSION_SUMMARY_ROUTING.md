@@ -8,7 +8,7 @@
 
 ## Summary
 
-Successfully implemented intelligent agent routing for the Mehaisi multi-agent orchestration system. The system now uses a sophisticated scoring algorithm combining capability matching, semantic similarity analysis, and historical success tracking to automatically select the best agent for any given task.
+Successfully implemented intelligent agent routing for the Mehaisi CodeSwarm multi-agent orchestration system. The system now uses a sophisticated scoring algorithm combining capability matching, semantic similarity analysis, and historical success tracking to automatically select the best agent for any given task.
 
 ---
 
@@ -82,7 +82,7 @@ When `auto_select_agent: true`, the orchestrator:
 
 ### 3. CLI Command (recommend.js + mehaisi.js)
 
-New command: `mehaisi recommend <task>`
+New command: `codeswarm recommend <task>`
 
 **Features:**
 - Loads all available agents from `.mehaisi/agents/`
@@ -97,7 +97,7 @@ New command: `mehaisi recommend <task>`
 
 **Example:**
 ```bash
-$ mehaisi recommend "Find API security vulnerabilities"
+$ codeswarm recommend "Find API security vulnerabilities"
 
 🧠 Intelligent Agent Routing
 Task: Find API security vulnerabilities
@@ -113,7 +113,7 @@ Task: Find API security vulnerabilities
   2. Code Janitor (35%)
 
 💡 To run this agent:
-   mehaisi run security-scanner
+   codeswarm run security-scanner
 ```
 
 ---
@@ -250,10 +250,10 @@ console.log(`Reason: ${routing.reason}`);
 
 ```bash
 # Get recommendation
-mehaisi recommend "Optimize database queries"
+codeswarm recommend "Optimize database queries"
 
 # Run recommended agent
-mehaisi run performance-optimizer
+codeswarm run performance-optimizer
 ```
 
 ---

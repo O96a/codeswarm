@@ -1,4 +1,4 @@
-# Mehaisi - Complete NPM Package
+# Mehaisi CodeSwarm - Complete NPM Package
 ## Multi-Agent AI Code Quality System with Full Coordination
 
 ---
@@ -30,7 +30,7 @@ A **production-ready NPM package** with:
   - `report-generator.js` - Report generation
   
 ### Commands (lib/commands/)
-- `init.js` - Initialize Mehaisi in any repo
+- `init.js` - Initialize Mehaisi CodeSwarm in any repo
 - `agents.js` - List and manage agents
 - `run.js` - Run single agent
 - `workflow.js` - Run agent workflows
@@ -131,7 +131,7 @@ cp -r mehaisi-package /path/to/your/project/node_modules/mehaisi
 # Or use as local dependency
 cd your-project
 npm install /path/to/mehaisi-package
-npx mehaisi init
+npx codeswarm init
 ```
 
 ---
@@ -152,14 +152,14 @@ curl -fsSL https://claude.ai/install.sh | bash
 # Configure for Ollama
 ollama launch claude
 
-# 2. Install Mehaisi (choose method above)
+# 2. Install Mehaisi CodeSwarm (choose method above)
 npm install -g mehaisi
 
 # 3. Go to your messy repo
 cd /path/to/your/messy/codebase
 
 # 4. Initialize
-mehaisi init
+codeswarm init
 
 # You'll see:
 # ✓ Directory structure created
@@ -172,10 +172,10 @@ mehaisi init
 
 ```bash
 # List available agents
-mehaisi agents --list
+codeswarm agents --list
 
 # Run investigation workflow (all investigator agents)
-mehaisi workflow investigate
+codeswarm workflow investigate
 
 # This will run:
 # 1. API Detective - finds API issues
@@ -196,7 +196,7 @@ mehaisi workflow investigate
 
 ```bash
 # View last session report
-mehaisi report --last
+codeswarm report --last
 
 # Check coordination summary
 # (automatically shown after workflow completes)
@@ -216,7 +216,7 @@ mehaisi report --last
 
 ```bash
 # Fix API issues
-mehaisi workflow fix-apis
+codeswarm workflow fix-apis
 
 # Agent coordination in action:
 # 1. API Connector queries API Detective findings
@@ -226,7 +226,7 @@ mehaisi workflow fix-apis
 # 5. Other agents see the fixes and adapt
 
 # Fix UI issues
-mehaisi workflow fix-ui
+codeswarm workflow fix-ui
 
 # Agents coordinate:
 # 1. Event Binder queries UI Inspector findings
@@ -239,7 +239,7 @@ mehaisi workflow fix-ui
 
 ```bash
 # Cautious mode (recommended first time)
-mehaisi pipeline cautious
+codeswarm pipeline cautious
 
 # This runs 5 phases:
 # Phase 1: Investigation (all investigators coordinate)
@@ -308,7 +308,7 @@ The **Coordination Hub** (`lib/coordination-hub.js`) enables agents to:
 ### Real Coordination Example
 
 ```bash
-$ mehaisi workflow investigate
+$ codeswarm workflow investigate
 
 🤖 Running: API Detective
   📊 Analyzing 45 API calls...
@@ -354,7 +354,7 @@ $ mehaisi workflow investigate
 ### Git-Based Safety
 - Every agent runs in isolated git branch
 - Automatic checkpoints every N agents
-- One-command rollback: `mehaisi rollback`
+- One-command rollback: `codeswarm rollback`
 - Never modifies main branch directly
 
 ### Test Validation
@@ -471,7 +471,7 @@ validation:
 ### Run Custom Agent
 
 ```bash
-mehaisi run my-custom-agent
+codeswarm run my-custom-agent
 ```
 
 ---
@@ -550,7 +550,7 @@ ollama launch claude --config
 npm test
 
 # Skip tests temporarily
-mehaisi run <agent> --skip-tests
+codeswarm run <agent> --skip-tests
 
 # Or disable in config
 # Set "require_tests": false in .mehaisi/config.json
@@ -612,7 +612,7 @@ Before using on production code:
 
 1. **Always start with investigation** - Don't fix blindly
 2. **Read the coordination summary** - Understand what agents found
-3. **Review diffs before accepting** - Use `mehaisi diff --last`
+3. **Review diffs before accepting** - Use `codeswarm diff --last`
 4. **Commit frequently** - After each successful agent
 5. **Don't skip tests** - They're your safety net
 6. **Use cautious pipeline first** - Speed up once comfortable

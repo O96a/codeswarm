@@ -2,7 +2,7 @@
 
 ## Quick Summary
 
-Successfully implemented **intelligent agent routing** for Mehaisi. The system can now automatically select the best agent for any task based on:
+Successfully implemented **intelligent agent routing** for Mehaisi CodeSwarm. The system can now automatically select the best agent for any task based on:
 
 1. **Capability matching** (40% weight)
 2. **Semantic similarity** to past successful resolutions (40% weight)  
@@ -30,7 +30,7 @@ const routing = await hub.selectBestAgent(issue);
 
 ### 💻 CLI Command
 ```bash
-mehaisi recommend "Find API security vulnerabilities"
+codeswarm recommend "Find API security vulnerabilities"
 # ✓ Recommended Agent: Security Scanner (85% confidence)
 # Reason: has security-analysis capability, resolved 3 similar issue(s)
 ```
@@ -103,7 +103,7 @@ console.log(`Reason: ${routing.reason}`);
 
 **CLI:**
 ```bash
-mehaisi recommend "Write unit tests for authentication"
+codeswarm recommend "Write unit tests for authentication"
 ```
 
 ---

@@ -1,6 +1,6 @@
-# Mehaisi Architecture 🐝
+# Mehaisi CodeSwarm Architecture 🐝
 
-Mehaisi is built on the **SONA** (Self-Optimizing Network of Agents) architecture. This document outlines the core components and their interactions.
+Mehaisi CodeSwarm is built on the **SONA** (Self-Optimizing Network of Agents) architecture. This document outlines the core components and their interactions.
 
 ## Core Components
 
@@ -40,7 +40,7 @@ Analyzes session outcomes to optimize routing weights and discover new agent cap
 
 ## Safety & Security
 
-Mehaisi implements multiple layers of safety:
+Mehaisi CodeSwarm implements multiple layers of safety:
 - **Git Sandboxing**: All changes happen in branches.
 - **Manual Approval**: Critical changes require human confirmation.
 - **Rate Limiting**: Prevents API abuse and runaway costs.

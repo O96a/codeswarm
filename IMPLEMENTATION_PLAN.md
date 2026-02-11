@@ -1,12 +1,12 @@
-# Mehaisi — RuVector Integration & LLM Modularity Plan
+# Mehaisi CodeSwarm — RuVector Integration & LLM Modularity Plan
 
-> Formerly: CodeSwarm → **Mehaisi**
+> Formerly: CodeSwarm → **Mehaisi CodeSwarm**
 > Base LLM: `kimi-k2.5:cloud` via Ollama Cloud + Claude Code CLI
 > Date: 2026-02-09
 
 ---
 
-## 1. Project Rebrand: CodeSwarm → Mehaisi
+## 1. Project Rebrand: CodeSwarm → Mehaisi CodeSwarm
 
 ### Scope
 Rename all references from `codeswarm` to `mehaisi` across:
@@ -158,7 +158,7 @@ const HARD_LIMITS = {
 | `ruvector-tiny-dancer-node` | ~500KB | Agent routing | Phase B |
 | `@ruvector/cli` | CLI tool | Claude Code hooks | Phase C (optional) |
 
-**Excluded** (not needed for Mehaisi):
+**Excluded** (not needed for Mehaisi CodeSwarm):
 - All Rust crates (`ruvector-*` on crates.io)
 - All WASM packages (`*-wasm`)
 - `ruvllm` (we use Ollama, not ruvector's LLM runtime)
@@ -207,7 +207,7 @@ npx @ruvector/cli hooks recall "authentication error"
 ## 5. Implementation Phases
 
 ### Phase A: Foundation (Do First)
-1. Rebrand: CodeSwarm → Mehaisi
+1. Rebrand: CodeSwarm → Mehaisi CodeSwarm
 2. Create `llm-provider.js` with provider abstraction
 3. Create `providers/ollama-cloud.js` (default — Kimi 2.5)
 4. Create `providers/ollama-local.js` (fallback)
