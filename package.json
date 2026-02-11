@@ -60,10 +60,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/O96a/mehaisi.git"
+    "url": "https://github.com/O96a/codeswarm.git"
   },
   "bugs": {
-    "url": "https://github.com/O96a/mehaisi/issues"
+    "url": "https://github.com/O96a/codeswarm/issues"
   },
-  "homepage": "https://github.com/O96a/mehaisi#readme"
+  "homepage": "https://github.com/O96a/codeswarm#readme"
 }

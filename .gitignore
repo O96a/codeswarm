@@ -2,7 +2,8 @@ node_modules/
 .env
 .DS_Store
 *.log
-.codeswarm/sessions/
-.codeswarm/temp/
+.mehaisi/
 package-lock.json
-\n# Ignore local vector DB\nruvector.db
+
+# Ignore local vector DB
+ruvector.db
