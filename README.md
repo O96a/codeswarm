@@ -2,7 +2,7 @@
   <img src="docs/assets/logo.svg" width="150" alt="Mehaisi CodeSwarm Logo">
 </p>
 
-<h1 align="center">Mehaisi CodeSwarm 🐝</h1>
+<h1 align="center">Mehaisi CodeSwarm</h1>
 
 <p align="center">
   <strong>State-of-the-art Multi-Agent AI Code Orchestration System</strong>

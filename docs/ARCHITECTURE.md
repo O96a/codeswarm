@@ -1,4 +1,4 @@
-# Mehaisi CodeSwarm Architecture 🐝
+# Mehaisi CodeSwarm Architecture 
 
 Mehaisi CodeSwarm is built on the **SONA** (Self-Optimizing Network of Agents) architecture. This document outlines the core components and their interactions.
 
