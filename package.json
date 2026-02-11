@@ -1,21 +1,27 @@
 {
   "name": "mehaisi",
   "version": "1.0.0",
-  "description": "Multi-agent AI code quality orchestration system powered by Claude Code and Ollama",
+  "description": "State-of-the-art multi-agent AI orchestration system for code quality, security, and performance optimization. Powered by SONA self-learning and vector memory.",
   "main": "lib/index.js",
   "bin": {
     "mehaisi": "./mehaisi.js"
   },
   "keywords": [
     "ai",
+    "multi-agent",
+    "orchestration",
     "code-quality",
     "refactoring",
     "debugging",
     "ollama",
     "claude-code",
     "automation",
-    "agent",
-    "multi-agent"
+    "self-learning",
+    "sona",
+    "vector-memory",
+    "semantic-search",
+    "devops",
+    "software-engineering"
   ],
   "author": "Your Name",
   "license": "MIT",

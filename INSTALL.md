@@ -73,7 +73,7 @@ npm install --save-dev mehaisi
 
 ### From Source
 ```bash
-git clone https://github.com/yourusername/mehaisi.git
+git clone https://github.com/O96a/mehaisi.git
 cd mehaisi
 npm install
 npm link
@@ -145,6 +145,6 @@ mehaisi status
 
 ## Getting Help
 
-- GitHub Issues: https://github.com/yourusername/mehaisi/issues
+- GitHub Issues: https://github.com/O96a/mehaisi/issues
 - Documentation: README.md
 - Agent Customization: See templates/agents/
