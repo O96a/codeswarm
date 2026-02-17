@@ -84,18 +84,36 @@ graph TD
     Router -->|Confidence Scored| A[Agent 1]
     Router -->|Confidence Scored| B[Agent 2]
     Router -->|Confidence Scored| C[Agent 3]
-    
+
     subgraph "Execution Layer"
         A & B & C --> Hub[Coordination Hub]
     end
-    
+
     Hub --> Memory[(Vector Memory)]
     Hub --> SONA[SONA Learning Engine]
-    
+
     SONA -->|Optimize Weights| Router
     Memory -->|Semantic Search| Router
-    
+
     Hub --> Results[Final Resolution]
+```
+
+## 📁 Project Structure
+
+```
+codeswarm/
+├── src/                      # Source code
+│   ├── providers/            # LLM provider integrations
+│   ├── codeswarm.js          # Main CLI entry point
+│   ├── orchestrator.js       # Core orchestration engine
+│   ├── agent-runner.js       # Agent execution
+│   ├── coordination-hub.js   # Agent coordination
+│   ├── safety-manager.js     # Safety & validation
+│   └── ...                   # Other modules
+├── templates/agents/         # Agent YAML definitions
+├── tests/                    # Unit & integration tests
+├── docs/                     # Documentation
+└── package.json
 ```
 
 ---

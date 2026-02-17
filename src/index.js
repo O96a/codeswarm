@@ -34,3 +34,28 @@ module.exports.UIFormatter = require('./ui-formatter');
 module.exports.OllamaCloudProvider = require('./providers/ollama-cloud');
 module.exports.OllamaLocalProvider = require('./providers/ollama-local');
 module.exports.ClaudeCodeProvider = require('./providers/claude-code');
+
+// Export error handling utilities
+module.exports.ErrorHandler = require('./error-handler').ErrorHandler;
+module.exports.CodeSwarmError = require('./error-handler').CodeSwarmError;
+module.exports.ValidationError = require('./error-handler').ValidationError;
+module.exports.AuthenticationError = require('./error-handler').AuthenticationError;
+module.exports.NetworkError = require('./error-handler').NetworkError;
+module.exports.FileSystemError = require('./error-handler').FileSystemError;
+module.exports.AgentExecutionError = require('./error-handler').AgentExecutionError;
+module.exports.GitError = require('./error-handler').GitError;
+module.exports.ConfigurationError = require('./error-handler').ConfigurationError;
+module.exports.SafetyError = require('./error-handler').SafetyError;
+
+// Export error handling utilities
+module.exports.Errors = require('./error-handler');
+module.exports.CodeSwarmError = require('./error-handler').CodeSwarmError;
+module.exports.ValidationError = require('./error-handler').ValidationError;
+module.exports.AuthenticationError = require('./error-handler').AuthenticationError;
+module.exports.NetworkError = require('./error-handler').NetworkError;
+module.exports.FileSystemError = require('./error-handler').FileSystemError;
+module.exports.AgentExecutionError = require('./error-handler').AgentExecutionError;
+module.exports.GitError = require('./error-handler').GitError;
+module.exports.ConfigurationError = require('./error-handler').ConfigurationError;
+module.exports.SafetyError = require('./error-handler').SafetyError;
+module.exports.ErrorHandler = require('./error-handler').ErrorHandler;
