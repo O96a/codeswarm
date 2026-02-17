@@ -2,7 +2,7 @@
 
 const { Command } = require('commander');
 const chalk = require('chalk');
-const packageJson = require('./package.json');
+const packageJson = require('../package.json');
 const { initializeProject } = require('./init');
 const { listAgents } = require('./agents');
 const { runAgent } = require('./run');
@@ -96,7 +96,10 @@ program
   .description('Rollback changes from a session')
   .option('-t, --to-checkpoint <checkpoint>', 'Rollback to specific checkpoint')
   .option('-f, --force', 'Force rollback without confirmation')
-  .action(rollback);
+  .action((options) => {
+    const { rollback } = require('./rollback');
+    rollback(options);
+  });
 
 // Status command
 program

@@ -482,7 +482,25 @@ class Orchestrator {
     }
   }
 
+  /**
+   * Validate that a name is safe (no path traversal or special chars)
+   * @param {string} name - The name to validate
+   * @returns {boolean} True if valid
+   */
+  isValidResourceName(name) {
+    if (!name || typeof name !== 'string') return false;
+    // Reject path traversal attempts and special characters
+    if (name.includes('..') || name.includes('/') || name.includes('\\')) return false;
+    // Only allow alphanumeric, hyphens, and underscores
+    return /^[a-zA-Z0-9_-]+$/.test(name);
+  }
+
   async loadAgentConfig(agentName) {
+    // Security: validate agent name to prevent path traversal
+    if (!this.isValidResourceName(agentName)) {
+      throw new Error(`Invalid agent name: ${agentName}. Only alphanumeric characters, hyphens, and underscores are allowed.`);
+    }
+
     const agentPath = path.join(process.cwd(), '.mehaisi', 'agents', `${agentName}.yml`);
 
     if (!await fs.pathExists(agentPath)) {
@@ -495,6 +513,11 @@ class Orchestrator {
   }
 
   async loadWorkflow(workflowName) {
+    // Security: validate workflow name to prevent path traversal
+    if (!this.isValidResourceName(workflowName)) {
+      throw new Error(`Invalid workflow name: ${workflowName}. Only alphanumeric characters, hyphens, and underscores are allowed.`);
+    }
+
     const workflowPath = path.join(process.cwd(), '.mehaisi', 'workflows', `${workflowName}.json`);
 
     if (!await fs.pathExists(workflowPath)) {
@@ -505,6 +528,11 @@ class Orchestrator {
   }
 
   async loadPipeline(strategy) {
+    // Security: validate pipeline name to prevent path traversal
+    if (!this.isValidResourceName(strategy)) {
+      throw new Error(`Invalid pipeline name: ${strategy}. Only alphanumeric characters, hyphens, and underscores are allowed.`);
+    }
+
     const pipelinePath = path.join(process.cwd(), '.mehaisi', 'pipelines', `${strategy}.json`);
 
     if (!await fs.pathExists(pipelinePath)) {

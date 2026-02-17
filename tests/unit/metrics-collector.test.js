@@ -1,4 +1,4 @@
-const MetricsCollector = require('../../metrics-collector');
+const MetricsCollector = require('../../src/metrics-collector');
 const fs = require('fs-extra');
 const path = require('path');
 

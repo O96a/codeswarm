@@ -1,5 +1,5 @@
-const CoordinationHub = require('../../coordination-hub');
-const RuVectorMemory = require('../../ruvector-memory');
+const CoordinationHub = require('../../src/coordination-hub');
+const RuVectorMemory = require('../../src/ruvector-memory');
 const fs = require('fs-extra');
 const path = require('path');
 

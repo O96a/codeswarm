@@ -1,4 +1,4 @@
-const GitManager = require('../../git-manager');
+const GitManager = require('../../src/git-manager');
 const simpleGit = require('simple-git');
 const fs = require('fs-extra');
 const path = require('path');

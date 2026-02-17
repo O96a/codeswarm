@@ -3,12 +3,15 @@ const fs = require('fs-extra');
 const path = require('path');
 const chalk = require('chalk');
 const yaml = require('yaml');
+const ui = require('./ui-formatter');
 const SchemaValidator = require('./schema-validator');
+const ModelResolver = require('./model-resolver');
 
 class AgentRunner {
   constructor(config, providerManager = null) {
     this.config = config;
     this.validator = new SchemaValidator();
+    this.modelResolver = new ModelResolver(config);
     this.runningProcesses = new Map();
 
     // Use provided provider manager or create standalone one
@@ -46,7 +49,7 @@ class AgentRunner {
   }
 
   async execute(agentName, agentConfig, options) {
-    console.log(chalk.cyan(`\n▶ Executing: ${agentConfig.name}\n`));
+    ui.progress(`Executing ${agentConfig.name}...`);
 
     // Report progress start
     if (agentConfig.coordination?.enabled && options.coordinationHub) {
@@ -67,7 +70,12 @@ class AgentRunner {
     } else {
       process.env.ANTHROPIC_AUTH_TOKEN = 'ollama';
       process.env.ANTHROPIC_BASE_URL = this.config.ollama_url;
-      process.env.ANTHROPIC_API_KEY = '';
+      // Only set API key if we have one, otherwise omit it
+      if (this.config.ollama_api_key) {
+        process.env.ANTHROPIC_API_KEY = this.config.ollama_api_key;
+      } else {
+        delete process.env.ANTHROPIC_API_KEY;
+      }
     }
 
     // Create instructions file for Claude Code
@@ -89,13 +97,13 @@ class AgentRunner {
     // Run Claude Code with timeout and error handling
     try {
       const timeout = this.config.agent_timeout || 600000; // 10 minutes default
-      const output = await this.executeWithTimeout(agentConfig, instructionsPath, options.agentId, timeout);
+      const output = await this.executeWithTimeout(agentConfig, instructionsPath, options.agentId, timeout, options);
 
       if (!output || output.trim() === '') {
         throw new Error('Agent produced no output');
       }
 
-      console.log(chalk.green('\n✓ Agent completed\n'));
+      console.log(chalk.green(`${ui.icons.check} Agent completed\n`));
 
       // Parse output and extract findings
       const result = this.parseAgentOutput(output, agentConfig);
@@ -109,7 +117,7 @@ class AgentRunner {
 
 
     } catch (error) {
-      console.error(chalk.red(`\n✗ Agent failed: ${error.message}\n`));
+      ui.error(`Agent failed: ${error.message}`, true);
 
       // Capture full error context
       const errorDetails = {
@@ -135,74 +143,39 @@ class AgentRunner {
   }
 
   /**
-   * Execute agent with timeout protection
+   * Execute agent with timeout protection using provider layer
    */
-  async executeWithTimeout(agentConfig, instructionsPath, agentId, timeout) {
-    return new Promise((resolve, reject) => {
-      const command = 'claude';
-      const args = [];
+  async executeWithTimeout(agentConfig, instructionsPath, agentId, timeout, runtimeOptions = {}) {
+    // Read instructions
+    const instructions = await fs.readFile(instructionsPath, 'utf8');
 
-      if (!process.env.CLAUDE_CODE_OLLAMA_MODEL) {
-        args.push('--model', agentConfig.model || this.config.model);
-      }
+    // Use ModelResolver for intelligent model and provider selection
+    const executionContext = this.modelResolver.getExecutionContext(agentConfig, runtimeOptions);
+    
+    // Display resolution info in verbose mode
+    if (process.env.MEHAISI_VERBOSE || runtimeOptions.verbose) {
+      this.modelResolver.displayResolutionInfo(agentConfig, runtimeOptions);
+    }
 
-      const childProcess = spawn(command, args, {
-        stdio: ['pipe', 'pipe', 'pipe']
+    try {
+      // Execute using provider manager with resolved context
+      const result = await this.providerManager.execute(instructions, {
+        provider: executionContext.provider,
+        model: executionContext.model,
+        timeout,
+        agentId,
+        workingDir: process.cwd()
       });
 
-      this.runningProcesses.set(agentId, childProcess);
-
-      let stdout = '';
-      let stderr = '';
-      let timedOut = false;
-
-      // Set timeout
-      const timeoutId = setTimeout(() => {
-        timedOut = true;
-        childProcess.kill('SIGTERM');
-        reject(new Error(`Agent execution timed out after ${timeout}ms`));
-      }, timeout);
-
-      // Capture output
-      childProcess.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      childProcess.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      // Handle process completion
-      childProcess.on('close', (code) => {
-        clearTimeout(timeoutId);
-
-        if (timedOut) return;
-
-        if (code !== 0) {
-          reject(new Error(`Agent exited with code ${code}. stderr: ${stderr}`));
-        } else {
-          resolve(stdout);
-        }
-      });
-
-      childProcess.on('error', (error) => {
-        clearTimeout(timeoutId);
-        if (!timedOut) {
-          reject(new Error(`Failed to start agent: ${error.message}`));
-        }
-      });
-
-      // Pipe instructions to stdin
-      fs.readFile(instructionsPath, 'utf8').then(instructions => {
-        childProcess.stdin.write(instructions);
-        childProcess.stdin.end();
-      }).catch(err => {
-        clearTimeout(timeoutId);
-        childProcess.kill();
-        reject(new Error(`Failed to read instructions: ${err.message}`));
-      });
-    });
+      // Extract output from provider result (flexible to different provider formats)
+      if (typeof result === 'string') return result;
+      return result.output || result.response || result.content || result.text || result;
+    } catch (error) {
+      // Re-throw with more context using the actual provider name
+      throw new Error(`Provider ${executionContext.provider} failed: ${error.message}`);
+    }
   }
+
 
   async buildCoordinationContext(hub, agentId, agentConfig) {
     let context = '\n\n## COORDINATION CONTEXT\n\n';

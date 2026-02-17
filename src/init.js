@@ -32,12 +32,13 @@ async function initializeProject(options) {
     await fs.ensureDir(path.join(mehaisiDir, 'sessions'));
     await fs.ensureDir(path.join(mehaisiDir, 'reports'));
 
-    // Copy agent templates
-    const files = await fs.readdir(__dirname);
+    // Copy agent templates from templates directory
+    const templatesDir = path.join(__dirname, '..', 'templates', 'agents');
+    const files = await fs.readdir(templatesDir);
     const agentFiles = files.filter(file => file.endsWith('.yml'));
 
     for (const file of agentFiles) {
-      await fs.copy(path.join(__dirname, file), path.join(mehaisiDir, 'agents', file));
+      await fs.copy(path.join(templatesDir, file), path.join(mehaisiDir, 'agents', file));
     }
 
     // Create default config with LLM provider abstraction

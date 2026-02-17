@@ -108,6 +108,8 @@ class CoordinationHub {
     if (agent) {
       agent.status = 'completed';
       agent.endTime = Date.now();
+      // Remove from active agents to prevent memory leak
+      this.activeAgents.delete(agentId);
       await this.saveState();
     }
   }

@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
-const SONALearner = require('../../sona-learner');
+const SONALearner = require('../../src/sona-learner');
 
 describe('SONALearner', () => {
   let tempDir;

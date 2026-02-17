@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const CoordinationHub = require('../../coordination-hub');
+const CoordinationHub = require('../../src/coordination-hub');
 
 describe('Agent Routing', () => {
   let hub;

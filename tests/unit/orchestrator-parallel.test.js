@@ -1,5 +1,5 @@
-const Orchestrator = require('../../orchestrator');
-const { ParallelExecutor } = require('../../parallel-executor');
+const Orchestrator = require('../../src/orchestrator');
+const { ParallelExecutor } = require('../../src/parallel-executor');
 const fs = require('fs-extra');
 const path = require('path');
 const yaml = require('yaml');

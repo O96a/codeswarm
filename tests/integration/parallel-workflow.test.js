@@ -1,4 +1,4 @@
-const Orchestrator = require('../../orchestrator');
+const Orchestrator = require('../../src/orchestrator');
 const fs = require('fs-extra');
 const path = require('path');
 const yaml = require('yaml');

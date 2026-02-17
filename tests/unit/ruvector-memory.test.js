@@ -1,4 +1,4 @@
-const RuVectorMemory = require('../../ruvector-memory');
+const RuVectorMemory = require('../../src/ruvector-memory');
 const fs = require('fs-extra');
 const path = require('path');
 

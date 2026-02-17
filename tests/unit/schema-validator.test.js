@@ -1,4 +1,4 @@
-const SchemaValidator = require('../../schema-validator');
+const SchemaValidator = require('../../src/schema-validator');
 
 describe('SchemaValidator', () => {
     let validator;

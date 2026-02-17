@@ -1,4 +1,4 @@
-const { LLMProvider, LLMProviderManager } = require('../../llm-provider');
+const { LLMProvider, LLMProviderManager } = require('../../src/llm-provider');
 
 // Mock provider classes for testing
 class MockProvider extends LLMProvider {

@@ -1,4 +1,4 @@
-const { ParallelExecutor, HARD_LIMITS } = require('../../parallel-executor');
+const { ParallelExecutor, HARD_LIMITS } = require('../../src/parallel-executor');
 const fs = require('fs-extra');
 const path = require('path');
 

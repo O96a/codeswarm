@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
-const HooksCollector = require('../../hooks-collector');
+const HooksCollector = require('../../src/hooks-collector');
 
 describe('HooksCollector', () => {
   let tempDir;
