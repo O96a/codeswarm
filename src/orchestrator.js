@@ -594,9 +594,9 @@ class Orchestrator {
    */
   isTransientError(error) {
     const transientMessages = [
-      'ECONNRESET',
-      'ETIMEDOUT',
-      'ENOTFOUND',
+      'econnreset',
+      'etimedout',
+      'enotfound',
       'network',
       'timeout',
       'temporary',

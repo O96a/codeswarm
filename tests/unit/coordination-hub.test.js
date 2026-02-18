@@ -5,7 +5,7 @@ const path = require('path');
 
 // Mock dependencies
 jest.mock('fs-extra');
-jest.mock('../../ruvector-memory');
+jest.mock('../../src/ruvector-memory');
 
 describe('CoordinationHub', () => {
     let hub;

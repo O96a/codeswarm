@@ -202,8 +202,8 @@ describe('Orchestrator', () => {
 
   describe('isTransientError', () => {
     it('should identify transient errors', () => {
-      expect(orchestrator.isTransientError(new Error('ECONNRESET'))).toBe(true);
-      expect(orchestrator.isTransientError(new Error('ETIMEDOUT'))).toBe(true);
+      expect(orchestrator.isTransientError(new Error('econnreset'))).toBe(true);
+      expect(orchestrator.isTransientError(new Error('etimedout'))).toBe(true);
       expect(orchestrator.isTransientError(new Error('network error'))).toBe(true);
       expect(orchestrator.isTransientError(new Error('temporary failure'))).toBe(true);
     });
@@ -287,7 +287,7 @@ describe('Orchestrator', () => {
       orchestrator.agentRunner.execute = jest.fn().mockImplementation(() => {
         attempts++;
         if (attempts < 2) {
-          return Promise.reject(new Error('ECONNRESET'));
+          return Promise.reject(new Error('econnreset'));
         }
         return Promise.resolve({ success: true });
       });

@@ -30,16 +30,16 @@ jest.mock('../../agent-runner', () => {
         execute: jest.fn()
     }));
 });
-jest.mock('../../report-generator');
-jest.mock('../../safety-manager');
+jest.mock('../../src/report-generator');
+jest.mock('../../src/safety-manager');
 jest.mock('../../coordination-hub', () => {
     return jest.fn().mockImplementation(() => ({
         initialize: jest.fn().mockResolvedValue(true),
         registerAgent: jest.fn().mockResolvedValue(true)
     }));
 });
-jest.mock('../../metrics-collector');
-jest.mock('../../schema-validator');
+jest.mock('../../src/metrics-collector');
+jest.mock('../../src/schema-validator');
 
 describe('Orchestrator Parallel Execution', () => {
     let orchestrator;
