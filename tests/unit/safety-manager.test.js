@@ -15,7 +15,8 @@ jest.mock('fs-extra', () => ({
   readFile: jest.fn().mockResolvedValue('test output'),
   writeFile: jest.fn().mockResolvedValue(true),
   ensureDir: jest.fn().mockResolvedValue(true),
-  readdir: jest.fn().mockResolvedValue(['test.test.js'])
+  readdir: jest.fn().mockResolvedValue(['test.test.js']),
+  existsSync: jest.fn().mockReturnValue(true)
 }));
 
 const { execSync, spawnSync } = require('child_process');

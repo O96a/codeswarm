@@ -2,6 +2,11 @@
  * Credential Manager Unit Tests
  */
 
+// Mock ui-formatter first (boxen is ESM-only and breaks Jest)
+jest.mock('../../src/ui-formatter', () => ({
+  icons: { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' }
+}));
+
 const CredentialManager = require('../../src/credential-manager');
 const fs = require('fs-extra');
 
