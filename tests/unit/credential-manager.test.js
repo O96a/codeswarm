@@ -4,7 +4,9 @@
 
 // Mock ui-formatter first (boxen is ESM-only and breaks Jest)
 jest.mock('../../src/ui-formatter', () => ({
-  icons: { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' }
+  icons: { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' },
+  warning: jest.fn(),
+  info: jest.fn()
 }));
 
 const CredentialManager = require('../../src/credential-manager');
@@ -14,8 +16,6 @@ jest.mock('fs-extra');
 jest.mock('inquirer', () => ({
   prompt: jest.fn()
 }));
-
-const inquirer = require('inquirer');
 
 describe('CredentialManager', () => {
   let credManager;

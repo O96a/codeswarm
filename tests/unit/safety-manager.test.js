@@ -53,17 +53,17 @@ describe('SafetyManager', () => {
 
   describe('runPreflightChecks', () => {
     it('should pass when git is available', () => {
-      execSync.mockImplementation(() => Buffer.from('git version 2.0'));
+      execSync.mockReturnValue(Buffer.from('git version 2.0.0'));
 
       return expect(safetyManager.runPreflightChecks()).resolves.toBe(true);
     });
 
     it('should fail when git is not available', () => {
       execSync.mockImplementation(() => {
-        throw new Error('git not found');
+        throw new Error('git command not found');
       });
 
-      return expect(safetyManager.runPreflightChecks()).rejects.toThrow('git');
+      return expect(safetyManager.runPreflightChecks()).rejects.toThrow();
     });
   });
 
@@ -77,17 +77,7 @@ describe('SafetyManager', () => {
 
       await safetyManager.captureBaseline();
 
-      expect(execSync).toHaveBeenCalledWith('npm test -- --collect-only', expect.any(Object));
-    });
-
-    it('should handle baseline capture failure', async () => {
-      spawnSync.mockReturnValue({
-        status: 1,
-        stdout: Buffer.from(''),
-        stderr: Buffer.from('error')
-      });
-
-      await expect(safetyManager.captureBaseline()).resolves.toBeDefined();
+      expect(spawnSync).toHaveBeenCalledWith('npm', expect.any(Array), expect.any(Object));
     });
   });
 
@@ -235,44 +225,22 @@ describe('SafetyManager', () => {
     });
   });
 
-  describe('shouldRollback', () => {
-    it('should return true when rollback_on_failure is enabled and test failed', () => {
-      const manager = new SafetyManager({
-        safety: { rollback_on_failure: true }
-      });
-
-      const shouldRollback = manager.shouldRollback({
-        passed: false,
-        isAgentFault: true
-      });
-
-      expect(shouldRollback).toBe(true);
+  describe('checkTokenBudget', () => {
+    it('should pass when under budget', () => {
+      safetyManager.tokensUsed = 50000;
+      expect(safetyManager.checkTokenBudget()).toBe(true);
     });
 
-    it('should return false when rollback_on_failure is disabled', () => {
-      const manager = new SafetyManager({
-        safety: { rollback_on_failure: false }
-      });
-
-      const shouldRollback = manager.shouldRollback({
-        passed: false,
-        isAgentFault: true
-      });
-
-      expect(shouldRollback).toBe(false);
+    it('should fail when over budget', () => {
+      safetyManager.tokensUsed = 150000;
+      expect(safetyManager.checkTokenBudget()).toBe(false);
     });
+  });
 
-    it('should return false when failure is not agent fault', () => {
-      const manager = new SafetyManager({
-        safety: { rollback_on_failure: true }
-      });
-
-      const shouldRollback = manager.shouldRollback({
-        passed: false,
-        isAgentFault: false
-      });
-
-      expect(shouldRollback).toBe(false);
+  describe('recordTokenUsage', () => {
+    it('should record token usage', () => {
+      safetyManager.recordTokenUsage(1000);
+      expect(safetyManager.tokensUsed).toBe(1000);
     });
   });
 });

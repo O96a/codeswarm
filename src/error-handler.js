@@ -132,11 +132,11 @@ class AgentExecutionError extends CodeSwarmError {
   constructor(message, options = {}) {
     super(message, {
       ...options,
-      code: options.code || 'AGENT_EXECUTION_ERROR',
-      agentName: options.agentName,
-      agentId: options.agentId
+      code: options.code || 'AGENT_EXECUTION_ERROR'
     });
     this.name = 'AgentExecutionError';
+    this.agentName = options.agentName;
+    this.agentId = options.agentId;
   }
 }
 
