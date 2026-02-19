@@ -26,6 +26,13 @@ describe('CredentialManager', () => {
     credManager = new CredentialManager(mockConfigPath);
   });
 
+  describe('constructor', () => {
+    it('should initialize with config path', () => {
+      expect(credManager.configPath).toBe(mockConfigPath);
+      expect(credManager.config).toBeNull();
+    });
+  });
+
   describe('loadConfig', () => {
     it('should load config from file', async () => {
       const mockConfig = { llm: { providers: {} } };
@@ -44,6 +51,18 @@ describe('CredentialManager', () => {
       const result = await credManager.loadConfig();
 
       expect(result).toBeNull();
+    });
+
+    it('should return cached config on subsequent calls', async () => {
+      const mockConfig = { llm: { providers: {} } };
+      fs.pathExists.mockResolvedValue(true);
+      fs.readJSON.mockResolvedValue(mockConfig);
+
+      await credManager.loadConfig();
+      const result2 = await credManager.loadConfig();
+
+      expect(fs.readJSON).toHaveBeenCalledTimes(1);
+      expect(result2).toEqual(mockConfig);
     });
   });
 
@@ -71,6 +90,18 @@ describe('CredentialManager', () => {
       delete process.env.OLLAMA_CLOUD_API_KEY;
     });
 
+    it('should get Ollama API key from environment (OLLAMA_API_KEY)', async () => {
+      process.env.OLLAMA_API_KEY = 'test-key-2';
+
+      const result = await credManager.getProviderCredentials('ollama', {
+        type: 'ollama',
+        url: 'https://api.ollama.com'
+      });
+
+      expect(result.apiKey).toBe('test-key-2');
+      delete process.env.OLLAMA_API_KEY;
+    });
+
     it('should get OpenAI API key from environment', async () => {
       process.env.OPENAI_API_KEY = 'sk-test';
 
@@ -92,33 +123,43 @@ describe('CredentialManager', () => {
       expect(result.sessionToken).toBe('session-123');
       delete process.env.ANTHROPIC_SESSION_TOKEN;
     });
-  });
 
-  describe('validateOllamaCloudKey', () => {
-    it('should return true for valid API key format', async () => {
-      const result = await credManager.validateOllamaCloudKey('sk-valid-key-123');
-      expect(result).toBe(true);
-    });
+    it('should return empty object for providers without credentials', async () => {
+      const result = await credManager.getProviderCredentials('local', {
+        type: 'local'
+      });
 
-    it('should return false for empty key', async () => {
-      const result = await credManager.validateOllamaCloudKey('');
-      expect(result).toBe(false);
-    });
-
-    it('should return false for short key', async () => {
-      const result = await credManager.validateOllamaCloudKey('short');
-      expect(result).toBe(false);
+      expect(result).toEqual({});
     });
   });
 
-  describe('validateOpenAIKey', () => {
-    it('should return true for valid OpenAI key format', async () => {
-      const result = await credManager.validateOpenAIKey('sk-proj-validkey123');
+  describe('needsCredentials', () => {
+    it('should return true for ollama cloud', () => {
+      const result = credManager.needsCredentials({
+        type: 'ollama',
+        url: 'https://api.ollama.com'
+      });
       expect(result).toBe(true);
     });
 
-    it('should return false for invalid format', async () => {
-      const result = await credManager.validateOpenAIKey('invalid-key');
+    it('should return true for claude-cli', () => {
+      const result = credManager.needsCredentials({
+        type: 'claude-cli'
+      });
+      expect(result).toBe(true);
+    });
+
+    it('should return true for openai', () => {
+      const result = credManager.needsCredentials({
+        type: 'openai'
+      });
+      expect(result).toBe(true);
+    });
+
+    it('should return false for local provider', () => {
+      const result = credManager.needsCredentials({
+        type: 'local'
+      });
       expect(result).toBe(false);
     });
   });
@@ -132,6 +173,26 @@ describe('CredentialManager', () => {
       await credManager.saveProviderCredentials('ollama', { apiKey: 'test-key' });
 
       expect(fs.writeJSON).toHaveBeenCalled();
+    });
+
+    it('should create providers object if not exists', async () => {
+      const currentConfig = { llm: {} };
+      fs.pathExists.mockResolvedValue(true);
+      fs.readJSON.mockResolvedValue(currentConfig);
+
+      await credManager.saveProviderCredentials('ollama', { apiKey: 'test-key' });
+
+      expect(fs.writeJSON).toHaveBeenCalledWith(
+        mockConfigPath,
+        expect.objectContaining({
+          llm: {
+            providers: {
+              ollama: { api_key: 'test-key' }
+            }
+          }
+        }),
+        { spaces: 2 }
+      );
     });
   });
 });

@@ -145,15 +145,17 @@ describe('CoordinationHub', () => {
     });
 
     describe('unregisterAgent()', () => {
-        test('marks agent as completed', async () => {
+        test('removes agent from activeAgents (prevents memory leak)', async () => {
             const agentConfig = { name: 'TestAgent', type: 'test' };
             await hub.registerAgent('agent-1', agentConfig);
 
+            // Verify agent is registered
+            expect(hub.activeAgents.has('agent-1')).toBe(true);
+
             await hub.unregisterAgent('agent-1');
 
-            const agent = hub.activeAgents.get('agent-1');
-            expect(agent.status).toBe('completed');
-            expect(agent.endTime).toBeDefined();
+            // Agent should be removed to prevent memory leak
+            expect(hub.activeAgents.has('agent-1')).toBe(false);
         });
 
         test('saves state after unregistration', async () => {

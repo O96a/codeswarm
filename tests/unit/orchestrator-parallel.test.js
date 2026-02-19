@@ -5,7 +5,7 @@ const path = require('path');
 const yaml = require('yaml');
 
 // Mock ui-formatter — it depends on boxen@8 (ESM-only) which Jest can't load
-jest.mock('../../ui-formatter', () => ({
+jest.mock('../../src/ui-formatter', () => ({
     header: jest.fn(),
     section: jest.fn(),
     divider: jest.fn(),
@@ -20,19 +20,19 @@ jest.mock('../../ui-formatter', () => ({
 }));
 
 jest.mock('fs-extra');
-jest.mock('../../git-manager', () => {
+jest.mock('../../src/git-manager', () => {
     return jest.fn().mockImplementation(() => ({
         initialize: jest.fn().mockResolvedValue(true)
     }));
 });
-jest.mock('../../agent-runner', () => {
+jest.mock('../../src/agent-runner', () => {
     return jest.fn().mockImplementation(() => ({
         execute: jest.fn()
     }));
 });
 jest.mock('../../src/report-generator');
 jest.mock('../../src/safety-manager');
-jest.mock('../../coordination-hub', () => {
+jest.mock('../../src/coordination-hub', () => {
     return jest.fn().mockImplementation(() => ({
         initialize: jest.fn().mockResolvedValue(true),
         registerAgent: jest.fn().mockResolvedValue(true)

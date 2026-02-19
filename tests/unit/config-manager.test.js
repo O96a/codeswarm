@@ -11,7 +11,8 @@ jest.mock('../../src/ui-formatter', () => ({
   warning: jest.fn(),
   error: jest.fn(),
   info: jest.fn(),
-  keyValue: jest.fn()
+  keyValue: jest.fn(),
+  spacer: jest.fn()
 }));
 
 const { configureSettings } = require('../../src/config-manager');
@@ -28,14 +29,26 @@ describe('Config Manager', () => {
     process.cwd = jest.fn().mockReturnValue('/test');
   });
 
+  const createMockConfig = () => ({
+    model: 'test-model',
+    ollama_url: 'http://localhost:11434',
+    safety: {
+      require_tests: true,
+      rollback_on_failure: true,
+      auto_apply: false
+    },
+    llm: {
+      default_provider: 'ollama-cloud',
+      providers: {}
+    },
+    execution: {
+      parallel_agents: 3
+    }
+  });
+
   describe('configureSettings', () => {
     it('should display current configuration with --list option', async () => {
-      const mockConfig = {
-        model: 'test-model',
-        ollama_url: 'http://localhost:11434',
-        safety: { require_tests: true, rollback_on_failure: true },
-        llm: { default_provider: 'ollama-cloud' }
-      };
+      const mockConfig = createMockConfig();
       fs.pathExists.mockResolvedValue(true);
       fs.readJSON.mockResolvedValue(mockConfig);
 
@@ -48,14 +61,11 @@ describe('Config Manager', () => {
       fs.pathExists.mockResolvedValue(false);
 
       await configureSettings({ list: true });
-      // Should not throw
+      // Should not throw, will show message about missing config
     });
 
     it('should handle interactive option', async () => {
-      const mockConfig = {
-        model: 'test-model',
-        safety: { require_tests: true, rollback_on_failure: true }
-      };
+      const mockConfig = createMockConfig();
       fs.pathExists.mockResolvedValue(true);
       fs.readJSON.mockResolvedValue(mockConfig);
 
@@ -65,10 +75,7 @@ describe('Config Manager', () => {
     });
 
     it('should update auto_apply setting', async () => {
-      const mockConfig = {
-        model: 'test-model',
-        safety: { require_tests: true, rollback_on_failure: true }
-      };
+      const mockConfig = createMockConfig();
       fs.pathExists.mockResolvedValue(true);
       fs.readJSON.mockResolvedValue(mockConfig);
 
@@ -78,10 +85,7 @@ describe('Config Manager', () => {
     });
 
     it('should update require_tests setting', async () => {
-      const mockConfig = {
-        model: 'test-model',
-        safety: { rollback_on_failure: true }
-      };
+      const mockConfig = createMockConfig();
       fs.pathExists.mockResolvedValue(true);
       fs.readJSON.mockResolvedValue(mockConfig);
 
@@ -91,10 +95,7 @@ describe('Config Manager', () => {
     });
 
     it('should update rollback_on_failure setting', async () => {
-      const mockConfig = {
-        model: 'test-model',
-        safety: { require_tests: true }
-      };
+      const mockConfig = createMockConfig();
       fs.pathExists.mockResolvedValue(true);
       fs.readJSON.mockResolvedValue(mockConfig);
 
@@ -104,10 +105,7 @@ describe('Config Manager', () => {
     });
 
     it('should update model setting', async () => {
-      const mockConfig = {
-        model: 'old-model',
-        safety: { require_tests: true, rollback_on_failure: true }
-      };
+      const mockConfig = createMockConfig();
       fs.pathExists.mockResolvedValue(true);
       fs.readJSON.mockResolvedValue(mockConfig);
 
@@ -121,11 +119,7 @@ describe('Config Manager', () => {
     });
 
     it('should update provider setting', async () => {
-      const mockConfig = {
-        model: 'test-model',
-        safety: { require_tests: true, rollback_on_failure: true },
-        llm: {}
-      };
+      const mockConfig = createMockConfig();
       fs.pathExists.mockResolvedValue(true);
       fs.readJSON.mockResolvedValue(mockConfig);
 
