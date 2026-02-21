@@ -114,14 +114,14 @@ describe('CredentialManager', () => {
     });
 
     it('should get Claude session token from environment', async () => {
-      process.env.ANTHROPIC_SESSION_TOKEN = 'session-123';
+      process.env.CLAUDE_CODE_SESSION_ACCESS_TOKEN = 'session-123';
 
       const result = await credManager.getProviderCredentials('claude-cli', {
         type: 'claude-cli'
       });
 
       expect(result.sessionToken).toBe('session-123');
-      delete process.env.ANTHROPIC_SESSION_TOKEN;
+      delete process.env.CLAUDE_CODE_SESSION_ACCESS_TOKEN;
     });
 
     it('should return empty object for providers without credentials', async () => {
@@ -164,13 +164,13 @@ describe('CredentialManager', () => {
     });
   });
 
-  describe('saveProviderCredentials', () => {
-    it('should save credentials to config', async () => {
+  describe('saveApiKeyToConfig', () => {
+    it('should save API key to config', async () => {
       const currentConfig = { llm: { providers: { ollama: {} } } };
       fs.pathExists.mockResolvedValue(true);
       fs.readJSON.mockResolvedValue(currentConfig);
 
-      await credManager.saveProviderCredentials('ollama', { apiKey: 'test-key' });
+      await credManager.saveApiKeyToConfig('ollama', 'test-key');
 
       expect(fs.writeJSON).toHaveBeenCalled();
     });
@@ -180,7 +180,7 @@ describe('CredentialManager', () => {
       fs.pathExists.mockResolvedValue(true);
       fs.readJSON.mockResolvedValue(currentConfig);
 
-      await credManager.saveProviderCredentials('ollama', { apiKey: 'test-key' });
+      await credManager.saveApiKeyToConfig('ollama', 'test-key');
 
       expect(fs.writeJSON).toHaveBeenCalledWith(
         mockConfigPath,
