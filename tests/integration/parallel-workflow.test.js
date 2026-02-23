@@ -4,7 +4,7 @@ const path = require('path');
 const yaml = require('yaml');
 
 // Mock ui-formatter — it depends on boxen@8 (ESM-only) which Jest can't load
-jest.mock('../../ui-formatter', () => ({
+jest.mock('../../src/ui-formatter', () => ({
     header: jest.fn(),
     section: jest.fn(),
     divider: jest.fn(),

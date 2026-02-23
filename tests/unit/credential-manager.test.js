@@ -6,11 +6,15 @@
 jest.mock('../../src/ui-formatter', () => ({
   icons: { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' },
   warning: jest.fn(),
-  info: jest.fn()
+  info: jest.fn(),
+  success: jest.fn(),
+  header: jest.fn(),
+  section: jest.fn()
 }));
 
 const CredentialManager = require('../../src/credential-manager');
 const fs = require('fs-extra');
+const { isEncrypted } = require('../../src/credential-encryption');
 
 jest.mock('fs-extra');
 jest.mock('inquirer', () => ({
@@ -182,17 +186,36 @@ describe('CredentialManager', () => {
 
       await credManager.saveApiKeyToConfig('ollama', 'test-key');
 
+      // API key should be encrypted (starts with 'enc:')
       expect(fs.writeJSON).toHaveBeenCalledWith(
         mockConfigPath,
         expect.objectContaining({
           llm: {
             providers: {
-              ollama: { api_key: 'test-key' }
+              ollama: expect.objectContaining({
+                api_key: expect.stringMatching(/^enc:/)
+              })
             }
           }
         }),
         { spaces: 2 }
       );
+    });
+
+    it('should encrypt API key before storage', async () => {
+      const currentConfig = { llm: { providers: {} } };
+      fs.pathExists.mockResolvedValue(true);
+      fs.readJSON.mockResolvedValue(currentConfig);
+
+      await credManager.saveApiKeyToConfig('openai', 'sk-test-key');
+
+      const writeCall = fs.writeJSON.mock.calls[0];
+      const writtenConfig = writeCall[1];
+      const apiKey = writtenConfig.llm.providers.openai.api_key;
+
+      // Should be encrypted, not plaintext
+      expect(apiKey).toMatch(/^enc:/);
+      expect(apiKey).not.toContain('sk-test-key');
     });
   });
 });

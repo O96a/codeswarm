@@ -1,8 +1,10 @@
 /**
  * Credential Manager
- * 
+ *
  * Handles API key and authentication credential collection, validation, and storage.
  * Prompts users interactively when credentials are missing.
+ *
+ * Security: API keys are encrypted before storage using AES-256-GCM.
  */
 
 const fs = require('fs-extra');
@@ -10,6 +12,7 @@ const path = require('path');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 const ui = require('./ui-formatter');
+const { encryptApiKey, decryptApiKey, isEncrypted } = require('./credential-encryption');
 
 class CredentialManager {
   constructor(configPath) {
@@ -19,25 +22,74 @@ class CredentialManager {
 
   /**
    * Load configuration from file
+   * Decrypts any encrypted API keys in memory
    */
   async loadConfig() {
     if (!this.config && await fs.pathExists(this.configPath)) {
       this.config = await fs.readJSON(this.configPath);
+      // Decrypt API keys in memory
+      this.config = this.decryptConfigKeys(this.config);
     }
     return this.config;
   }
 
   /**
    * Save configuration to file
+   * Encrypts API keys before storage
    */
   async saveConfig(config) {
-    await fs.writeJSON(this.configPath, config, { spaces: 2 });
+    // Encrypt API keys before saving to disk
+    const encryptedConfig = this.encryptConfigKeys(config);
+    await fs.writeJSON(this.configPath, encryptedConfig, { spaces: 2 });
+    // Keep decrypted version in memory
     this.config = config;
   }
 
   /**
+   * Encrypt all API keys in a config object for storage
+   * @param {Object} config - Config object
+   * @returns {Object} Config with encrypted API keys
+   */
+  encryptConfigKeys(config) {
+    if (!config || !config.llm?.providers) {
+      return config;
+    }
+
+    const encrypted = JSON.parse(JSON.stringify(config));
+
+    for (const [name, provider] of Object.entries(encrypted.llm.providers)) {
+      if (provider.api_key && !isEncrypted(provider.api_key)) {
+        provider.api_key = encryptApiKey(provider.api_key);
+      }
+    }
+
+    return encrypted;
+  }
+
+  /**
+   * Decrypt all API keys in a config object for in-memory use
+   * @param {Object} config - Config object
+   * @returns {Object} Config with decrypted API keys
+   */
+  decryptConfigKeys(config) {
+    if (!config || !config.llm?.providers) {
+      return config;
+    }
+
+    const decrypted = JSON.parse(JSON.stringify(config));
+
+    for (const [name, provider] of Object.entries(decrypted.llm.providers)) {
+      if (provider.api_key) {
+        provider.api_key = decryptApiKey(provider.api_key);
+      }
+    }
+
+    return decrypted;
+  }
+
+  /**
    * Get provider credentials with interactive prompting if missing
-   * 
+   *
    * @param {string} providerName - Name of the provider
    * @param {Object} providerConfig - Provider configuration
    * @returns {Object} Credentials object
@@ -72,7 +124,7 @@ class CredentialManager {
    * Get Ollama Cloud API key from environment, config, or prompt
    */
   async getOllamaCloudKey(providerConfig) {
-    // Check environment first
+    // Check environment first (highest priority)
     if (process.env.OLLAMA_CLOUD_API_KEY) {
       return process.env.OLLAMA_CLOUD_API_KEY;
     }
@@ -80,7 +132,7 @@ class CredentialManager {
       return process.env.OLLAMA_API_KEY;
     }
 
-    // Check config
+    // Check config (already decrypted in loadConfig)
     if (providerConfig.api_key) {
       return providerConfig.api_key;
     }
@@ -106,15 +158,15 @@ class CredentialManager {
       {
         type: 'confirm',
         name: 'saveToConfig',
-        message: 'Save API key to config file (.mehaisi/config.json)?',
+        message: 'Save API key to config file (encrypted)?',
         default: true
       }
     ]);
 
-    // Save to config if requested
+    // Save to config if requested (will be encrypted in saveConfig)
     if (saveToConfig) {
       await this.saveApiKeyToConfig('ollama-cloud', apiKey.trim());
-      ui.success('API key saved to config', true);
+      ui.success('API key saved to config (encrypted)', true);
       console.log('');
     } else {
       ui.info('Tip: Set OLLAMA_CLOUD_API_KEY environment variable', true);
@@ -171,7 +223,7 @@ class CredentialManager {
       return process.env.OPENAI_API_KEY;
     }
 
-    // Check config
+    // Check config (already decrypted in loadConfig)
     if (providerConfig.api_key) {
       return providerConfig.api_key;
     }
@@ -200,15 +252,15 @@ class CredentialManager {
       {
         type: 'confirm',
         name: 'saveToConfig',
-        message: 'Save API key to config file (.mehaisi/config.json)?',
+        message: 'Save API key to config file (encrypted)?',
         default: true
       }
     ]);
 
-    // Save to config if requested
+    // Save to config if requested (will be encrypted in saveConfig)
     if (saveToConfig) {
       await this.saveApiKeyToConfig('openai', apiKey.trim());
-      ui.success('API key saved to config', true);
+      ui.success('API key saved to config (encrypted)', true);
       console.log('');
     } else {
       ui.info('Tip: Set OPENAI_API_KEY environment variable', true);
@@ -220,10 +272,11 @@ class CredentialManager {
 
   /**
    * Save API key to provider config
+   * The key will be encrypted before storage
    */
   async saveApiKeyToConfig(providerName, apiKey) {
     const config = await this.loadConfig();
-    
+
     if (!config.llm) {
       config.llm = { providers: {} };
     }
@@ -234,13 +287,14 @@ class CredentialManager {
       config.llm.providers[providerName] = {};
     }
 
+    // Store plaintext in memory, will be encrypted in saveConfig
     config.llm.providers[providerName].api_key = apiKey;
     await this.saveConfig(config);
   }
 
   /**
    * Validate credentials work by testing the provider
-   * 
+   *
    * @param {string} providerName - Provider name
    * @param {Object} credentials - Credentials to validate
    * @returns {Promise<boolean>} Whether credentials are valid
@@ -253,7 +307,7 @@ class CredentialManager {
 
   /**
    * Check if credentials are needed for a provider
-   * 
+   *
    * @param {Object} providerConfig - Provider configuration
    * @returns {boolean} Whether credentials are required
    */
@@ -276,7 +330,7 @@ class CredentialManager {
    */
   async setupAllCredentials() {
     const config = await this.loadConfig();
-    
+
     if (!config.llm?.providers) {
       ui.warning('No providers configured', true);
       return;
@@ -292,6 +346,37 @@ class CredentialManager {
     }
 
     ui.success('Credential setup complete');
+  }
+
+  /**
+   * Migrate existing plaintext API keys to encrypted storage
+   * Call this after updating to use encrypted storage
+   */
+  async migrateToEncryptedStorage() {
+    if (!await fs.pathExists(this.configPath)) {
+      return false;
+    }
+
+    const rawConfig = await fs.readJSON(this.configPath);
+    let migrated = false;
+
+    if (rawConfig.llm?.providers) {
+      for (const [name, provider] of Object.entries(rawConfig.llm.providers)) {
+        if (provider.api_key && !isEncrypted(provider.api_key)) {
+          // Key is plaintext, will be encrypted on next save
+          migrated = true;
+        }
+      }
+    }
+
+    if (migrated) {
+      // Load and save to trigger encryption
+      await this.loadConfig();
+      await this.saveConfig(this.config);
+      console.log('✓ Migrated API keys to encrypted storage');
+    }
+
+    return migrated;
   }
 }
 

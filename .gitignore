@@ -2,8 +2,19 @@ node_modules/
 .env
 .DS_Store
 *.log
-.mehaisi/
-package-lock.json
+
+# Protect sensitive configuration files
+.mehaisi/config.json
+.mehaisi/sessions/
+.mehaisi/reports/
+
+# Allow templates and workflows to be tracked
+!.mehaisi/agents/
+!.mehaisi/workflows/
+!.mehaisi/pipelines/
 
 # Ignore local vector DB
 ruvector.db
+
+# Track package-lock.json for reproducible builds
+# (removed from ignore list)

@@ -22,12 +22,18 @@ class ClaudeCodeProvider extends LLMProvider {
         const timeout = options.timeout || this.timeout;
         const agentId = options.agentId || 'unknown';
 
+        // Get auth token from environment or credential manager
+        // Priority: ANTHROPIC_AUTH_TOKEN env var > credential manager
+        const authToken = process.env.ANTHROPIC_AUTH_TOKEN ||
+                          (this.credentialManager && await this.credentialManager.getAuthToken?.()) ||
+                          'ollama'; // Default fallback for Ollama Cloud
+
         // Setup environment for Claude Code to use Ollama Cloud
         const env = {
             ...process.env,
-            ANTHROPIC_AUTH_TOKEN: 'ollama',
+            ANTHROPIC_AUTH_TOKEN: authToken,
             ANTHROPIC_BASE_URL: this.ollamaUrl,
-            ANTHROPIC_API_KEY: '',
+            ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || '',
             CLAUDE_INSTANCE_ID: agentId
         };
 
