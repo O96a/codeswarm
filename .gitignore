@@ -16,5 +16,11 @@ node_modules/
 # Ignore local vector DB
 ruvector.db
 
+# Test coverage output
+coverage/
+
+# Test artifacts
+.test-mehaisi-parallel/
+
 # Track package-lock.json for reproducible builds
 # (removed from ignore list)

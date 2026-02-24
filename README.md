@@ -1,24 +1,26 @@
 <p align="center">
-  <img src="docs/assets/logo.svg" width="150" alt="Mehaisi CodeSwarm Logo">
+ <img src="docs/assets/logo.svg" width="150" alt="Mehaisi CodeSwarm Logo">
 </p>
 
 <h1 align="center">Mehaisi CodeSwarm</h1>
 
 <p align="center">
-  <strong>State-of-the-art Multi-Agent AI Code Orchestration System</strong>
+ <strong>State-of-the-art Multi-Agent AI Code Orchestration System</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/O96a/codeswarm/actions"><img src="https://img.shields.io/badge/tests-258%2F276%20passing-brightgreen" alt="Tests"></a>
-  <a href="https://github.com/O96a/codeswarm/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"></a>
-  <a href="https://www.npmjs.com/package/mehaisi-codeswarm"><img src="https://img.shields.io/npm/v/mehaisi-codeswarm?color=orange" alt="NPM Version"></a>
-  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D16.0.0-blue" alt="Node Support"></a>
-  <a href="https://github.com/O96a/codeswarm/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs Welcome"></a>
-  <a href="https://twitter.com/intent/follow?screen_name=O96a"><img src="https://img.shields.io/twitter/follow/O96a?style=social" alt="Twitter Follow"></a>
+ <a href="https://github.com/O96a/codeswarm/actions"><img src="https://img.shields.io/github/actions/workflow/status/O96a/codeswarm/ci.yml?branch=main&label=tests&color=brightgreen" alt="Tests"></a>
+ <a href="https://github.com/O96a/codeswarm/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"></a>
+ <a href="https://www.npmjs.com/package/mehaisi-codeswarm"><img src="https://img.shields.io/npm/v/mehaisi-codeswarm?color=orange" alt="NPM Version"></a>
+ <a href="https://www.npmjs.com/package/mehaisi-codeswarm"><img src="https://img.shields.io/npm/dm/mehaisi-codeswarm?color=blue" alt="NPM Downloads"></a>
+ <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D16.0.0-blue" alt="Node Support"></a>
+ <a href="https://github.com/O96a/codeswarm/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs Welcome"></a>
+ <a href="https://github.com/O96a/codeswarm/issues"><img src="https://img.shields.io/github/issues/O96a/codeswarm" alt="Issues"></a>
+ <a href="https://twitter.com/intent/follow?screen_name=O96a"><img src="https://img.shields.io/twitter/follow/O96a?style=social" alt="Twitter Follow"></a>
 </p>
 
 <p align="center">
-  Transform messy codebases into production-grade applications using AI agents that learn, coordinate, and make smart decisions. <strong>Mehaisi CodeSwarm</strong> leverages <strong>SONA</strong> (Self-Optimizing Network of Agents) to provide intelligent routing, parallel execution, and semantic memory.
+ Transform messy codebases into production-grade applications using AI agents that learn, coordinate, and make smart decisions. <strong>Mehaisi CodeSwarm</strong> leverages <strong>SONA</strong> (Self-Optimizing Network of Agents) to provide intelligent routing, parallel execution, and semantic memory.
 </p>
 
 ---
@@ -34,6 +36,7 @@
 - [🤖 Agent Types](#-agent-types)
 - [🧪 Testing](#-testing)
 - [🛡️ Safety](#-safety)
+- [📚 Documentation](#-documentation)
 - [🔮 Roadmap](#-roadmap)
 - [🤝 Contributing](#-contributing)
 - [📜 License](#-license)
@@ -80,39 +83,39 @@ Traditional code quality tools are static. Mehaisi CodeSwarm is **dynamic**:
 
 ```mermaid
 graph TD
-    User([User Task]) --> Router{Intelligent Router}
-    Router -->|Confidence Scored| A[Agent 1]
-    Router -->|Confidence Scored| B[Agent 2]
-    Router -->|Confidence Scored| C[Agent 3]
+ User([User Task]) --> Router{Intelligent Router}
+ Router -->|Confidence Scored| A[Agent 1]
+ Router -->|Confidence Scored| B[Agent 2]
+ Router -->|Confidence Scored| C[Agent 3]
 
-    subgraph "Execution Layer"
-        A & B & C --> Hub[Coordination Hub]
-    end
+ subgraph "Execution Layer"
+ A & B & C --> Hub[Coordination Hub]
+ end
 
-    Hub --> Memory[(Vector Memory)]
-    Hub --> SONA[SONA Learning Engine]
+ Hub --> Memory[(Vector Memory)]
+ Hub --> SONA[SONA Learning Engine]
 
-    SONA -->|Optimize Weights| Router
-    Memory -->|Semantic Search| Router
+ SONA -->|Optimize Weights| Router
+ Memory -->|Semantic Search| Router
 
-    Hub --> Results[Final Resolution]
+ Hub --> Results[Final Resolution]
 ```
 
 ## 📁 Project Structure
 
 ```
 codeswarm/
-├── src/                      # Source code
-│   ├── providers/            # LLM provider integrations
-│   ├── codeswarm.js          # Main CLI entry point
-│   ├── orchestrator.js       # Core orchestration engine
-│   ├── agent-runner.js       # Agent execution
-│   ├── coordination-hub.js   # Agent coordination
-│   ├── safety-manager.js     # Safety & validation
-│   └── ...                   # Other modules
-├── templates/agents/         # Agent YAML definitions
-├── tests/                    # Unit & integration tests
-├── docs/                     # Documentation
+├── src/ # Source code
+│ ├── providers/ # LLM provider integrations
+│ ├── codeswarm.js # Main CLI entry point
+│ ├── orchestrator.js # Core orchestration engine
+│ ├── agent-runner.js # Agent execution
+│ ├── coordination-hub.js # Agent coordination
+│ ├── safety-manager.js # Safety & validation
+│ └── ... # Other modules
+├── templates/agents/ # Agent YAML definitions
+├── tests/ # Unit & integration tests
+├── docs/ # Documentation
 └── package.json
 ```
 
@@ -140,24 +143,50 @@ codeswarm workflow investigate
 
 ### Prerequisites
 
-- **Node.js** (v16+)
-- **Ollama** (for local/cloud models)
+- **Node.js** (v16 or higher)
+- **Ollama** (for local/cloud models) - [Install Ollama](https://ollama.ai/)
 - **Claude Code** (optional, for advanced reasoning)
 - **Git**
 
 ### Install via NPM
 
 ```bash
+# Install globally
 npm install -g mehaisi-codeswarm
+
+# Verify installation
+codeswarm --version
 ```
 
-### From Source
+### Install from Source
 
 ```bash
+# Clone the repository
 git clone https://github.com/O96a/codeswarm.git
 cd codeswarm
+
+# Install dependencies
 npm install
+
+# Link for global access
 npm link
+
+# Verify installation
+codeswarm --version
+```
+
+### First-Time Setup
+
+```bash
+# Initialize in your project directory
+cd your-project
+codeswarm init
+
+# Configure your LLM providers
+codeswarm credentials
+
+# Verify configuration
+codeswarm status
 ```
 
 ---
@@ -180,6 +209,43 @@ Securely manage your API keys for Ollama Cloud and Claude Code.
 codeswarm credentials
 ```
 
+### Configuration File
+
+Edit `.mehaisi/config.json` for advanced settings:
+
+```json
+{
+ "model": "kimi-k2.5:cloud",
+ "ollama_url": "https://api.ollama.com",
+ "llm": {
+ "default_provider": "claude-code",
+ "providers": {
+ "ollama-cloud": { "enabled": true },
+ "ollama-local": { "enabled": true },
+ "claude-code": { "enabled": true }
+ }
+ },
+ "execution": {
+ "parallel_agents": 3,
+ "max_claude_instances": 3,
+ "instance_timeout": 600000
+ },
+ "safety": {
+ "auto_apply": false,
+ "require_tests": true,
+ "rollback_on_failure": true
+ },
+ "coordination": {
+ "enabled": true,
+ "learning": {
+ "enabled": true,
+ "capture_file_operations": true,
+ "capture_commands": true
+ }
+ }
+}
+```
+
 ---
 
 ## 🤖 Agent Types
@@ -193,6 +259,19 @@ Mehaisi CodeSwarm comes with **19 specialized agents**:
 | **Builders** | `test-writer`, `performance-optimizer`, `documentation-writer` |
 | **QA** | `integration-validator`, `stress-tester`, `production-checker` |
 
+### Quick Reference
+
+```bash
+# List all available agents
+codeswarm agents --list
+
+# Get recommendation for a task
+codeswarm recommend "Your task description here"
+
+# Run a specific agent
+codeswarm run api-detective
+```
+
 ---
 
 ## 🧪 Testing
@@ -202,6 +281,12 @@ Mehaisi CodeSwarm is built with reliability in mind.
 ```bash
 # Run the full test suite
 npm test
+
+# Run with coverage
+npm test -- --coverage
+
+# Run specific tests
+npm test -- tests/unit/orchestrator.test.js
 ```
 
 **Current Status:** 258/276 tests passing (94%) - All critical paths verified ✅.
@@ -214,6 +299,26 @@ npm test
 - **Human Approval**: High-risk changes always require confirmation.
 - **Test-Driven**: Changes are only applied if tests pass.
 - **Token Budgets**: Prevent runaway costs and API usage.
+
+---
+
+## 📚 Documentation
+
+| Guide | Description |
+|-------|-------------|
+| [Architecture](docs/ARCHITECTURE.md) | System architecture and component overview |
+| [Credentials Setup](docs/credentials.md) | Setting up API credentials |
+| [Deployment](docs/deployment.md) | Production deployment guide |
+| [Hooks System](docs/hooks.md) | Using Claude Code hooks |
+| [Model Selection](docs/model-selection.md) | Choosing the right LLM model |
+| [Testing Guide](docs/testing.md) | Comprehensive testing documentation |
+
+### Quick Links
+
+- [Quick Reference](QUICKREF.md) - Common commands and workflows
+- [Contributing](CONTRIBUTING.md) - How to contribute
+- [Changelog](CHANGELOG.md) - Version history
+- [Security Policy](SECURITY.md) - Security guidelines
 
 ---
 
@@ -247,6 +352,12 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
+## 🌟 Support
+
+If you find this project helpful, please consider giving it a ⭐ on [GitHub](https://github.com/O96a/codeswarm)!
+
+---
+
 <p align="center">
-  Built with ❤️ by <a href="https://github.com/O96a">O96a</a>
+ Built with ❤️ by <a href="https://github.com/O96a">O96a</a>
 </p>
